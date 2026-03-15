@@ -1,6 +1,6 @@
 import Auth from "./Auth";
 import { motion, type Variants } from "framer-motion";
-import CustomCursor from "./CustomCursor";
+import CustomCursor from "./components/CustomCursor";
 import Roadmap from "./Roadmap";
 import Dashboard from "./Dashboard";
 
