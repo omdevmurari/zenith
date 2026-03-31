@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const protect = require("./middleware/authMiddleware");
+const admin = require("./middleware/adminMiddleware");
 
 dotenv.config();
 
@@ -31,6 +32,13 @@ app.listen(PORT, () => {
 app.get("/api/protected", protect, (req, res) => {
   res.json({
     message: "Protected Route Accessed",
+    user: req.user
+  });
+});
+
+app.get("/api/admin", protect, admin, (req, res) => {
+  res.json({
+    message: "Admin Access Granted",
     user: req.user
   });
 });
