@@ -98,7 +98,7 @@ export default function Auth() {
         transition={{ duration: 2 }}
         // Using #0b1229 makes it slightly lighter than the background, but solid.
         // Increased text size and added whitespace-nowrap to make it stretch massively.
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20vw] md:text-[25vw] font-black text-[#0b1229] whitespace-nowrap pointer-events-none select-none tracking-tighter z-10 drop-shadow-2xl"
+        className=" hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20vw] md:text-[25vw] font-black text-[#0b1229] whitespace-nowrap pointer-events-none select-none tracking-tighter z-10 drop-shadow-2xl"
       >
         ZENITH
       </motion.div>

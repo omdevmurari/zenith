@@ -23,3 +23,5 @@ body {
     linear-gradient(to right, rgba(52, 211, 153, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(52, 211, 153, 0.05) 1px, transparent 1px);
 }
+
+/* Disable custom cursors and force default behavior on touch devices */
