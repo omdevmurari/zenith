@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const protect = require("./middleware/authMiddleware");
 const admin = require("./middleware/adminMiddleware");
+const roadmapRoutes = require("./routes/roadmapRoutes");
 
 dotenv.config();
 
@@ -42,3 +43,5 @@ app.get("/api/admin", protect, admin, (req, res) => {
     user: req.user
   });
 });
+
+app.use("/api/roadmaps", roadmapRoutes);
