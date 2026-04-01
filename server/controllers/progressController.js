@@ -1,6 +1,25 @@
 const User = require("../models/User");
 const Node = require("../models/Node");
 const Activity = require("../models/Activity");
+const Roadmap = require("../models/Roadmap");
+
+exports.getDashboardStats = async (req, res) => {
+  try {
+
+    const user = await User.findById(req.user._id);
+
+    res.json({
+      totalXP: user.xp,
+      streak: user.streak,
+      longestStreak: user.longestStreak,
+      completedNodes: user.completedNodes.length,
+      startedRoadmaps: user.clonedRoadmaps.length
+    });
+
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
 
 exports.completeNode = async (req, res) => {
   try {
@@ -20,6 +39,25 @@ exports.completeNode = async (req, res) => {
     await user.save();
 
     const today = new Date().toISOString().split("T")[0];
+
+    if (user.lastActive !== today) {
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+    if (user.lastActive === yesterdayStr) {
+      user.streak += 1;
+    } else {
+      user.streak = 1;
+    }
+
+    if (user.streak > user.longestStreak) {
+      user.longestStreak = user.streak;
+    }
+
+    user.lastActive = today;
+  }
 
     let activity = await Activity.findOne({
       user: user._id,
