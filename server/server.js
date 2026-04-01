@@ -7,6 +7,7 @@ const roadmapRoutes = require("./routes/roadmapRoutes");
 const nodeRoutes = require("./routes/nodeRoutes");
 const progressRoutes = require("./routes/progressRoutes");
 const activityRoutes = require("./routes/activityRoutes");
+const leaderboardRoutes = require("./routes/leaderboardRoutes");
 
 dotenv.config();
 
@@ -54,3 +55,5 @@ app.use("/api/nodes", nodeRoutes);
 app.use("/api/progress", progressRoutes);
 
 app.use("/api/activity", activityRoutes);
+
+app.use("/api/leaderboard", leaderboardRoutes);
