@@ -6,6 +6,7 @@ const admin = require("./middleware/adminMiddleware");
 const roadmapRoutes = require("./routes/roadmapRoutes");
 const nodeRoutes = require("./routes/nodeRoutes");
 const progressRoutes = require("./routes/progressRoutes");
+const activityRoutes = require("./routes/activityRoutes");
 
 dotenv.config();
 
@@ -51,3 +52,5 @@ app.use("/api/roadmaps", roadmapRoutes);
 app.use("/api/nodes", nodeRoutes);
 
 app.use("/api/progress", progressRoutes);
+
+app.use("/api/activity", activityRoutes);

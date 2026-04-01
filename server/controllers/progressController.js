@@ -1,8 +1,10 @@
 const User = require("../models/User");
 const Node = require("../models/Node");
+const Activity = require("../models/Activity");
 
 exports.completeNode = async (req, res) => {
   try {
+
     const node = await Node.findById(req.params.nodeId);
 
     const user = await User.findById(req.user._id);
@@ -16,6 +18,27 @@ exports.completeNode = async (req, res) => {
     user.xp += node.xpValue;
 
     await user.save();
+
+    const today = new Date().toISOString().split("T")[0];
+
+    let activity = await Activity.findOne({
+      user: user._id,
+      date: today
+    });
+
+    if (activity) {
+      activity.xpEarned += node.xpValue;
+      activity.nodesCompleted += 1;
+    } else {
+      activity = await Activity.create({
+        user: user._id,
+        date: today,
+        xpEarned: node.xpValue,
+        nodesCompleted: 1
+      });
+    }
+
+    await activity.save();
 
     res.json({
       message: "Node completed",
