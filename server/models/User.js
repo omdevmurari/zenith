@@ -30,6 +30,18 @@ const userSchema = new mongoose.Schema(
         ref: "Roadmap",
       },
     ],
+    completedNodes: [
+      {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Node"
+        }
+    ],
+
+      xp: {
+        type: Number,
+        default: 0
+    },
+
   },
   { timestamps: true }
 );

@@ -1,4 +1,5 @@
 const Roadmap = require("../models/Roadmap");
+const User = require("../models/User");
 
 exports.createRoadmap = async (req, res) => {
   try {
@@ -21,6 +22,44 @@ exports.getRoadmaps = async (req, res) => {
     const roadmaps = await Roadmap.find();
 
     res.json(roadmaps);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+exports.cloneRoadmap = async (req, res) => {
+  try {
+
+    const user = await User.findById(req.user._id);
+
+    const roadmapId = req.params.roadmapId;
+
+    if (user.clonedRoadmaps.includes(roadmapId)) {
+      return res.json({ message: "Already started" });
+    }
+
+    user.clonedRoadmaps.push(roadmapId);
+
+    await user.save();
+
+    res.json({
+      message: "Roadmap started",
+      roadmapId
+    });
+
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+exports.getUserRoadmaps = async (req, res) => {
+  try {
+
+    const user = await User.findById(req.user._id)
+      .populate("clonedRoadmaps");
+
+    res.json(user.clonedRoadmaps);
+
   } catch (error) {
     res.status(500).json(error);
   }
