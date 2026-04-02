@@ -1,8 +1,9 @@
+import { useRef } from "react";
 import Auth from "./Auth";
 import { motion, type Variants } from "framer-motion";
-import CustomCursor from "../components/CustomCursor";
 import Roadmap from "./Roadmap";
 import Dashboard from "./Dashboard";
+import Explore from "./Explore";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -18,18 +19,57 @@ const itemVariants: Variants = {
 };
 
 function App() {
+
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.reload();
+};
+
+  const token = localStorage.getItem("token");
+  const isLoggedIn = !!token;
+
+  const exploreRef = useRef<HTMLDivElement>(null);
+  const authRef = useRef<HTMLDivElement>(null);
+
+  const scrollToExplore = () => {
+    exploreRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToAuth = () => {
+    authRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <>
-      <CustomCursor />
-      
-      {/* Main wrapper covering the entire app */}
-      <div className="bg-roadmap-grid relative flex flex-col items-center overflow-clip w-full">
-        
-        {/* --- 1. HERO SECTION (Forced to 100% Viewport Height) --- */}
-        <section className="relative w-full h-screen flex flex-col items-center justify-center">
-          
-          {/* Background glow centered perfectly in the screen */}
-          <motion.div 
+    /* Main wrapper covering the entire app */
+    <div className="bg-roadmap-grid relative flex flex-col items-center overflow-clip w-full">
+
+      {/* HERO */}
+      <section className="relative w-full h-screen flex flex-col items-center justify-center">
+
+        {/* Logout Button */}
+{isLoggedIn && (
+  <button
+    onClick={handleLogout}
+    className="
+    absolute top-6 right-8 z-50
+    px-5 py-2
+    bg-slate-900
+    border border-slate-700
+    hover:border-red-400
+    hover:text-red-400
+    rounded-xl
+    transition-all
+    text-sm
+    font-semibold
+    "
+  >
+    Logout
+  </button>
+)}
+
+        {/* Background glow centered perfectly in the screen */}
+          <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.5, ease: "easeOut" }}
@@ -42,7 +82,8 @@ function App() {
             animate="show"
             className="max-w-4xl text-center space-y-10 relative z-10 w-full px-8 -mt-10" // -mt-10 shifts it slightly up for perfect optical centering
           >
-            <motion.div variants={itemVariants} className="space-y-4">
+
+          <motion.div variants={itemVariants} className="space-y-4">
               <p className="text-emerald-400 font-mono tracking-widest uppercase text-sm font-semibold">
                 System Online • Milestones Ready
               </p>
@@ -50,22 +91,48 @@ function App() {
                 Chart Your Zenith
               </h1>
             </motion.div>
-            
+
             <motion.p variants={itemVariants} className="text-xl text-slate-400 font-light leading-relaxed max-w-2xl mx-auto">
               The ultimate visual roadmap for your skills. Lock in your targets, track your daily progress, and watch your knowledge graph turn green.
             </motion.p>
-            
-            <motion.div variants={itemVariants} className="pt-8 flex justify-center gap-6">
-              <button className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all rounded-xl font-bold text-lg cursor-none shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] hover:-translate-y-1 relative z-20">
-                Initialize Tracker
-              </button>
-              <button className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-slate-500 transition-all rounded-xl font-semibold text-lg cursor-none relative z-20">
-                View Public Roadmaps
-              </button>
-            </motion.div>
-          </motion.main>
 
-          {/* SCROLL DOWN HINT ANIMATION */}
+          <motion.div variants={itemVariants} className="pt-8 flex justify-center gap-6">
+
+            {/* Guest Mode */}
+            {!isLoggedIn && (
+              <button
+                onClick={scrollToExplore}
+                className="px-8 py-4 bg-emerald-500 rounded-xl font-bold"
+              >
+                Try Guest Mode
+              </button>
+            )}
+
+            {/* Login CTA */}
+            {!isLoggedIn && (
+              <button
+                onClick={scrollToAuth}
+                className="px-8 py-4 bg-slate-800 rounded-xl"
+              >
+                Login / Register
+              </button>
+            )}
+
+            {/* Continue (Logged In) */}
+            {isLoggedIn && (
+              <button
+                onClick={scrollToExplore}
+                className="px-8 py-4 bg-emerald-500 rounded-xl"
+              >
+                Continue Journey
+              </button>
+            )}
+
+          </motion.div>
+
+        </motion.main>
+
+        {/* SCROLL DOWN HINT ANIMATION */}
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -83,32 +150,29 @@ function App() {
               />
             </div>
 
-            
           </motion.div>
 
-        </section>
-
-        {/* --- 2. ROADMAP SECTION --- */}
-        <Roadmap />
-
-        {/* --- 3. DASHBOARD SECTION --- */}
-        <Dashboard />
-
-        {/* --- 4. AUTH SECTION --- */}
-        <Auth />
-
-        {/* --- 5. ADMIN BUILDER SECTION --- */}
-        {/* <AdminBuilder /> */}
-
-        {/* --- 6. EXPLORE SECTION --- */}
-        {/* <Explore /> */}
-
-         {/* --- 7. ADMIN DASHBOARD SECTION --- */}
-        {/* <AdminDashboard /> */}
-
-
+      </section>
+      
+      {/* CATALOGUE */}
+      <div ref={exploreRef}>
+        <Explore isLoggedIn={isLoggedIn} />
       </div>
-    </>
+
+      {/* Logged In Only */}
+      {isLoggedIn && (
+        <>
+          <Roadmap />
+          <Dashboard />
+        </>
+      )}
+
+      {/* Auth */}
+      {!isLoggedIn && (
+          <Auth />
+      )}
+
+    </div>
   );
 }
 

@@ -20,7 +20,12 @@ const connections = [
   { from: 5, to: 6 },
 ];
 
-export default function Roadmap() {
+interface RoadmapProps {
+  isLoggedIn?: boolean;
+}
+
+export default function Roadmap({ isLoggedIn: _isLoggedIn }: RoadmapProps) {
+  // isLoggedIn is accepted for API compatibility; roadmap is currently read-only
   return (
     <section className="relative w-full h-[800px] bg-[#020617] overflow-hidden flex items-center justify-center border-t border-slate-800/50 mt-20 shadow-[inset_0_100px_100px_rgba(2,6,23,1)]">
       

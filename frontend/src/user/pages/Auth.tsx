@@ -1,8 +1,80 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (e: any) => {
+  e.preventDefault();
+  try {
+    const res = await fetch(
+      "http://localhost:5000/api/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
+      }
+    );
+
+    const data = await res.json();
+
+     if (res.ok) {
+  localStorage.setItem("token", data.token);
+
+  if (data.user) {
+    localStorage.setItem("user", JSON.stringify(data.user));
+  }
+
+  window.location.href = "/";
+}
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRegister = async (e: any) => {
+  e.preventDefault();
+  try {
+    const res = await fetch(
+      "http://localhost:5000/api/auth/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password
+        })
+      }
+    );
+
+    const data = await res.json();
+      if (res.ok) {
+  localStorage.setItem("token", data.token);
+
+  if (data.user) {
+    localStorage.setItem("user", JSON.stringify(data.user));
+  }
+
+  window.location.href = "/";
+}
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <section className="min-h-screen w-full bg-[#020617] flex items-center justify-center relative overflow-hidden border-t border-slate-800">
@@ -151,15 +223,17 @@ export default function Auth() {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.2 }}
                 className="flex flex-col gap-5"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={handleLogin}
               >
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">
                     Email Address
                   </label>
                   <input
+                    value={email}
                     type="email"
                     placeholder="om@gmail.com"
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all cursor-none"
                   />
                 </div>
@@ -177,11 +251,13 @@ export default function Auth() {
                   </div>
                   <input
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all cursor-none"
                   />
                 </div>
-                <button className="w-full mt-4 bg-white hover:bg-slate-200 text-slate-950 font-black text-lg py-4 rounded-xl transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)] cursor-none">
+                <button type="submit" className="w-full mt-4 bg-white hover:bg-slate-200 text-slate-950 font-black text-lg py-4 rounded-xl transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)] cursor-none">
                   Initialize Session
                 </button>
               </motion.form>
@@ -194,13 +270,15 @@ export default function Auth() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
                 className="flex flex-col gap-5"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={handleRegister}
               >
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">
                     Full Name
                   </label>
                   <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     type="text"
                     placeholder="Om Devmurari"
                     className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all cursor-none"
@@ -211,6 +289,8 @@ export default function Auth() {
                     Email Address
                   </label>
                   <input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     type="email"
                     placeholder="om@gmail.com"
                     className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all cursor-none"
@@ -221,12 +301,14 @@ export default function Auth() {
                     Password
                   </label>
                   <input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     type="password"
                     placeholder="••••••••"
                     className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all cursor-none"
                   />
                 </div>
-                <button className="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-lg py-4 rounded-xl transition-colors shadow-[0_0_20px_rgba(52,211,153,0.3)] cursor-none">
+                <button type="submit" className="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-lg py-4 rounded-xl transition-colors shadow-[0_0_20px_rgba(52,211,153,0.3)] cursor-none">
                   Create Zenith ID
                 </button>
               </motion.form>

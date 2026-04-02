@@ -9,7 +9,7 @@ const initialMilestones = [
 ];
 
 export default function AdminBuilder() {
-  const [milestones, setMilestones] = useState(initialMilestones);
+  const [milestones, _setMilestones] = useState(initialMilestones);
   const [activeId, setActiveId] = useState<number | null>(1);
   const [isEditing, setIsEditing] = useState(false);
   

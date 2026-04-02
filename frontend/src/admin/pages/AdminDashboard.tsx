@@ -1,4 +1,6 @@
 import { motion, type Variants } from "framer-motion";
+import CustomCursor from "../../components/CustomCursor";
+
 
 // --- MOCK DATA ---
 const systemStats = [
@@ -125,3 +127,5 @@ export default function AdminDashboard() {
     </section>
   );
 }
+
+<CustomCursor /> 

@@ -1,13 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-
-// --- MOCK DATA ---
-const activeRoadmaps = [
-  { title: "AWT Project: Zenith", progress: 75, color: "bg-emerald-400" },
-  { title: "Algorithm Mastery & LeetCode", progress: 40, color: "bg-cyan-400" },
-  { title: "Acoustic Guitar Basics", progress: 15, color: "bg-amber-400" },
-  { title: "Physical Conditioning (Fat Loss)", progress: 60, color: "bg-purple-400" },
-];
 
 // --- ANIMATION VARIANTS ---
 // This handles the stagger effect (delaying each child element slightly)
@@ -27,19 +19,97 @@ const cardVars: Variants = {
 export default function Dashboard() {
   const [viewMode, setViewMode] = useState<"overview" | "focus">("overview");
 
-  const generateHeatmap = () => {
-    const days = [];
-    for (let i = 0; i < 119; i++) {
-      const intensity = Math.random();
-      let colorClass = "bg-slate-800/50"; 
-      if (intensity > 0.8) colorClass = "bg-emerald-400 shadow-[0_0_8px_#34d399]";
-      else if (intensity > 0.5) colorClass = "bg-emerald-600";
-      else if (intensity > 0.2) colorClass = "bg-emerald-800";
-      
-      days.push(<div key={i} className={`w-3 h-3 md:w-4 md:h-4 rounded-sm ${colorClass} transition-all hover:scale-125 hover:ring-2 ring-white cursor-none`} />);
+  const [stats, setStats] = useState<any>(null);
+  const [activity, setActivity] = useState<any[]>([]);
+  const [roadmaps, setRoadmaps] = useState<any[]>([]);
+  const [nodes, setNodes] = useState<any[]>([]);
+
+  useEffect(() => {
+  const fetchData = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+
+      const statsRes = await fetch(
+        "http://localhost:5000/api/progress/stats",
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      const statsData = await statsRes.json();
+      setStats(statsData);
+
+
+      const activityRes = await fetch(
+        "http://localhost:5000/api/activity",
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      const activityData = await activityRes.json();
+      setActivity(activityData);
+
+
+      const roadmapRes = await fetch(
+        "http://localhost:5000/api/roadmaps/my",
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      const roadmapData = await roadmapRes.json();
+      setRoadmaps(roadmapData);
+
+
+      // ✅ Fetch nodes safely
+      if (roadmapData?.length > 0) {
+
+        const nodeRes = await fetch(
+          `http://localhost:5000/api/nodes/${roadmapData[0]._id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        const nodeData = await nodeRes.json();
+        setNodes(nodeData);
+      }
+
+    } catch (error) {
+      console.error(error);
     }
-    return days;
   };
+
+  fetchData();
+}, []);
+
+  const generateHeatmap = () => {
+  const days = [];
+
+  for (let i = 0; i < 119; i++) {
+    const day = activity[i];
+
+    let colorClass = "bg-slate-800/50";
+
+    if (day?.nodesCompleted > 3)
+      colorClass = "bg-emerald-400 shadow-[0_0_8px_#34d399]";
+    else if (day?.nodesCompleted > 1)
+      colorClass = "bg-emerald-600";
+    else if (day?.nodesCompleted > 0)
+      colorClass = "bg-emerald-800";
+
+    days.push(
+      <div
+        key={i}
+        className={`w-3 h-3 md:w-4 md:h-4 rounded-sm ${colorClass} transition-all hover:scale-125 hover:ring-2 ring-white cursor-none`}
+      />
+    );
+  }
+
+  return days;
+};
 
   return (
     <section className="min-h-screen w-full bg-[#020617] text-slate-200 p-6 md:p-12 font-sans relative z-20 border-t border-slate-800/60 overflow-hidden">
@@ -104,7 +174,7 @@ export default function Dashboard() {
                         Consistency Heatmap
                       </h2>
                       <div className="text-right">
-                        <span className="text-2xl font-black text-emerald-400 tracking-tighter">Day 42</span>
+                        <span className="text-2xl font-black text-emerald-400 tracking-tighter">{stats?.streak || 0}</span>
                         <span className="block text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Current Streak</span>
                       </div>
                     </div>
@@ -145,11 +215,11 @@ export default function Dashboard() {
                 <motion.div variants={cardVars} className="bg-slate-900/40 border border-slate-800/80 rounded-[2rem] p-8 backdrop-blur-sm h-fit shadow-xl">
                   <h2 className="text-lg font-bold text-white mb-8">Active Roadmaps</h2>
                   <div className="space-y-8">
-                    {activeRoadmaps.map((roadmap, i) => (
+                    {(roadmaps.length ? roadmaps : []).map((roadmap, i) => (
                       <div key={i} className="group cursor-none">
                         <div className="flex justify-between text-sm mb-3">
                           <span className="text-slate-300 font-bold group-hover:text-white transition-colors">{roadmap.title}</span>
-                          <span className="text-slate-400 font-mono bg-slate-800 px-2 py-0.5 rounded text-xs">{roadmap.progress}%</span>
+                          <span className="text-slate-400 font-mono bg-slate-800 px-2 py-0.5 rounded text-xs">{Math.floor(Math.random() * 100)}%</span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                           <motion.div 
@@ -180,7 +250,7 @@ export default function Dashboard() {
                       <span className="w-8 h-[1px] bg-emerald-500 block" /> Today's Directive
                     </p>
                     <h2 className="text-6xl md:text-7xl font-black text-white leading-[1.1] tracking-tighter">
-                      Execute <br /> <span className="text-slate-600">The Backend.</span>
+                      {roadmaps?.[0]?.title || "Execute Your Roadmap"}
                     </h2>
                     <p className="text-lg text-slate-400 font-light max-w-sm leading-relaxed">
                        Your AWT project database schema is pending. Secure the MySQL connection today.
@@ -192,11 +262,11 @@ export default function Dashboard() {
 
                   <motion.div variants={cardVars} className="border-l border-slate-800/80 pl-8 md:pl-16 space-y-12 cursor-none">
                     <div>
-                      <span className="text-6xl font-light text-white">12</span>
+                      <span className="text-6xl font-light text-white">{nodes?.length || 0}</span>
                       <span className="text-slate-500 ml-4 uppercase tracking-[0.2em] text-xs font-bold">Milestones Left</span>
                     </div>
                     <div>
-                      <span className="text-6xl font-light text-white">04</span>
+                      <span className="text-6xl font-light text-white">{roadmaps?.length || 0}</span>
                       <span className="text-slate-500 ml-4 uppercase tracking-[0.2em] text-xs font-bold">Active Roadmaps</span>
                       <div className="mt-8 space-y-4 text-sm font-medium">
                          <div className="flex justify-between border-b border-slate-800/60 pb-3"><span className="text-slate-300">AWT Project</span> <span className="text-emerald-400">In Progress</span></div>
