@@ -25,64 +25,94 @@ export default function Dashboard() {
   const [nodes, setNodes] = useState<any[]>([]);
 
   useEffect(() => {
-  const fetchData = async () => {
-    const token = localStorage.getItem("token");
 
-    try {
+const fetchData = async () => {
 
-      const statsRes = await fetch(
-        "http://localhost:5000/api/progress/stats",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+const token = localStorage.getItem("token");
 
-      const statsData = await statsRes.json();
-      setStats(statsData);
+if (!token) return;
 
+try {
 
-      const activityRes = await fetch(
-        "http://localhost:5000/api/activity",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+const statsRes = await fetch(
+"http://localhost:5000/api/progress/stats",
+{
+headers: {
+Authorization: `Bearer ${token}`
+}
+}
+);
 
-      const activityData = await activityRes.json();
-      setActivity(activityData);
+if (statsRes.ok) {
+const statsData = await statsRes.json();
+setStats(statsData);
+}
 
 
-      const roadmapRes = await fetch(
-        "http://localhost:5000/api/roadmaps/my",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+const activityRes = await fetch(
+"http://localhost:5000/api/activity",
+{
+headers: {
+Authorization: `Bearer ${token}`
+}
+}
+);
 
-      const roadmapData = await roadmapRes.json();
-      setRoadmaps(roadmapData);
+if (activityRes.ok) {
+const activityData = await activityRes.json();
+setActivity(activityData || []);
+}
 
 
-      // ✅ Fetch nodes safely
-      if (roadmapData?.length > 0) {
+// ✅ Fetch user roadmaps
+const roadmapRes = await fetch(
+"http://localhost:5000/api/user-roadmaps/my",
+{
+headers: {
+Authorization: `Bearer ${token}`
+}
+}
+);
 
-        const nodeRes = await fetch(
-          `http://localhost:5000/api/nodes/${roadmapData[0]._id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+if (roadmapRes.ok) {
 
-        const nodeData = await nodeRes.json();
-        setNodes(nodeData);
-      }
+const roadmapData = await roadmapRes.json();
 
-    } catch (error) {
-      console.error(error);
-    }
-  };
+setRoadmaps(Array.isArray(roadmapData) ? roadmapData : []);
 
-  fetchData();
+
+// ✅ Fetch nodes of FIRST roadmap correctly
+if (roadmapData?.length > 0) {
+
+const firstRoadmapId =
+roadmapData[0]?.roadmapId?._id;
+
+const nodeRes = await fetch(
+`http://localhost:5000/api/nodes/${firstRoadmapId}`,
+{
+headers: {
+Authorization: `Bearer ${token}`
+}
+}
+);
+
+if (nodeRes.ok) {
+const nodeData = await nodeRes.json();
+setNodes(nodeData || []);
+}
+
+}
+
+}
+
+} catch (error) {
+console.error(error);
+}
+
+};
+
+fetchData();
+
 }, []);
 
   const generateHeatmap = () => {
@@ -181,13 +211,13 @@ export default function Dashboard() {
                     
                     <div className="flex gap-3 pb-2 w-max">
                       <div className="grid grid-rows-7 gap-1.5 md:gap-2 text-[10px] text-slate-500 font-mono pr-2 uppercase tracking-widest text-right">
-                        <div className="h-3 md:h-4 flex items-center justify-end"></div>
-                        <div className="h-3 md:h-4 flex items-center justify-end">Mon</div>
-                        <div className="h-3 md:h-4 flex items-center justify-end"></div>
-                        <div className="h-3 md:h-4 flex items-center justify-end">Wed</div>
-                        <div className="h-3 md:h-4 flex items-center justify-end"></div>
-                        <div className="h-3 md:h-4 flex items-center justify-end">Fri</div>
-                        <div className="h-3 md:h-4 flex items-center justify-end"></div>
+                        <div className="h-3 md:h-4 flex items-center justify-end">MON</div>
+                        <div className="h-3 md:h-4 flex items-center justify-end">TUE</div>
+                        <div className="h-3 md:h-4 flex items-center justify-end">WED</div>
+                        <div className="h-3 md:h-4 flex items-center justify-end">THU</div>
+                        <div className="h-3 md:h-4 flex items-center justify-end">FRI</div>
+                        <div className="h-3 md:h-4 flex items-center justify-end">SAT</div>
+                        <div className="h-3 md:h-4 flex items-center justify-end">SUN</div>
                       </div>
                       <div className="grid grid-rows-7 grid-flow-col gap-1.5 md:gap-2">
                         {generateHeatmap()}
@@ -215,20 +245,44 @@ export default function Dashboard() {
                 <motion.div variants={cardVars} className="bg-slate-900/40 border border-slate-800/80 rounded-[2rem] p-8 backdrop-blur-sm h-fit shadow-xl">
                   <h2 className="text-lg font-bold text-white mb-8">Active Roadmaps</h2>
                   <div className="space-y-8">
-                    {(roadmaps.length ? roadmaps : []).map((roadmap, i) => (
-                      <div key={i} className="group cursor-none">
+                    {roadmaps.length === 0 && (
+                      <p className="text-slate-500 text-sm">
+                        No active roadmaps yet
+                      </p>
+                    )}
+
+                    {roadmaps.map((item: any, i) => (
+
+                      <div key={item._id || i} className="group cursor-none">
+
                         <div className="flex justify-between text-sm mb-3">
-                          <span className="text-slate-300 font-bold group-hover:text-white transition-colors">{roadmap.title}</span>
-                          <span className="text-slate-400 font-mono bg-slate-800 px-2 py-0.5 rounded text-xs">{Math.floor(Math.random() * 100)}%</span>
+
+                          <span className="text-slate-300 font-bold group-hover:text-white transition-colors">
+                            {item?.roadmapId?.title ?? "Untitled Roadmap"}
+                          </span>
+
+                          <span className="text-slate-400 font-mono bg-slate-800 px-2 py-0.5 rounded text-xs">
+                            {Math.min(item?.progress || 0, 100)}%
+                          </span>
+
                         </div>
                         <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                          <motion.div 
-                            initial={{ width: 0 }} whileInView={{ width: `${roadmap.progress}%` }} viewport={{ once: true }} transition={{ duration: 1, delay: 0.2 }}
-                            className={`h-full ${roadmap.color} shadow-[0_0_10px_currentColor] opacity-90`}
+                          <motion.div
+                            initial={{ width: 0 }}
+                            whileInView={{
+                              width: `${Math.min(item?.progress || 0, 100)}%`
+                            }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1, delay: 0.2 }}
+                            className="h-full bg-emerald-400 shadow-[0_0_10px_#34d399]"
                           />
+
                         </div>
+
                       </div>
+
                     ))}
+
                   </div>
                 </motion.div>
               </motion.div>
@@ -250,7 +304,7 @@ export default function Dashboard() {
                       <span className="w-8 h-[1px] bg-emerald-500 block" /> Today's Directive
                     </p>
                     <h2 className="text-6xl md:text-7xl font-black text-white leading-[1.1] tracking-tighter">
-                      {roadmaps?.[0]?.title || "Execute Your Roadmap"}
+                      {roadmaps?.[0]?.roadmapId?.title || "Execute Your Roadmap"}
                     </h2>
                     <p className="text-lg text-slate-400 font-light max-w-sm leading-relaxed">
                        Your AWT project database schema is pending. Secure the MySQL connection today.

@@ -9,33 +9,45 @@ export default function Auth() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async (e: any) => {
-  e.preventDefault();
-  try {
-    const res = await fetch(
-      "http://localhost:5000/api/auth/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email,
-          password
-        })
+    e.preventDefault();
+    try {
+      const res = await fetch(
+        "http://localhost:5000/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+
+        localStorage.setItem("token", data.token);
+
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("role", data.user.role);
+        }
+
+        // Admin redirect
+        if (data.user?.role === "admin") {
+          window.location.href = "/admin";
+        } else {
+          if (data.user?.role === "admin") {
+            window.location.href = "/admin";
+          } else {
+            window.location.href = "/";
+          }
+        }
+
       }
-    );
-
-    const data = await res.json();
-
-     if (res.ok) {
-  localStorage.setItem("token", data.token);
-
-  if (data.user) {
-    localStorage.setItem("user", JSON.stringify(data.user));
-  }
-
-  window.location.href = "/";
-}
 
     } catch (error) {
       console.error(error);
@@ -43,33 +55,33 @@ export default function Auth() {
   };
 
   const handleRegister = async (e: any) => {
-  e.preventDefault();
-  try {
-    const res = await fetch(
-      "http://localhost:5000/api/auth/register",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password
-        })
-      }
-    );
+    e.preventDefault();
+    try {
+      const res = await fetch(
+        "http://localhost:5000/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password
+          })
+        }
+      );
 
-    const data = await res.json();
+      const data = await res.json();
       if (res.ok) {
-  localStorage.setItem("token", data.token);
+        localStorage.setItem("token", data.token);
 
-  if (data.user) {
-    localStorage.setItem("user", JSON.stringify(data.user));
-  }
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
 
-  window.location.href = "/";
-}
+        window.location.href = "/";
+      }
 
     } catch (error) {
       console.error(error);
@@ -78,93 +90,92 @@ export default function Auth() {
 
   return (
     <section className="min-h-screen w-full bg-[#020617] flex items-center justify-center relative overflow-hidden border-t border-slate-800">
-      
+
       {/* Constellation Background Elements */}
-     {/* STARFIELD BACKGROUND */}
-<svg
-  className="absolute inset-0 w-full h-full pointer-events-none"
-  viewBox="0 0 1200 600"
-  preserveAspectRatio="none"
->
-  {/* FAR SMALL STARS */}
-  {Array.from({ length: 200 }).map((_, i) => {
-    const cx = Math.random() * 1200;
-    const cy = Math.random() * 600;
-    const r = Math.random() * 0.7 + 0.2;
+      {/* STARFIELD BACKGROUND */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        viewBox="0 0 1200 600"
+        preserveAspectRatio="none"
+      >
+        {/* FAR SMALL STARS */}
+        {Array.from({ length: 200 }).map((_, i) => {
+          const cx = Math.random() * 1200;
+          const cy = Math.random() * 600;
+          const r = Math.random() * 0.7 + 0.2;
 
-    return (
-      <motion.circle
-        key={"small-" + i}
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill="#ffffff"
-        initial={{ opacity: 0.1 }}
-        animate={{ y: [0, -10, 0] }}
-        transition={{
-          duration: 2 + Math.random() * 4,
-          delay: Math.random() * 5,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-    );
-  })}
+          return (
+            <motion.circle
+              key={"small-" + i}
+              cx={cx}
+              cy={cy}
+              r={r}
+              fill="#ffffff"
+              initial={{ opacity: 0.1 }}
+              animate={{ y: [0, -10, 0] }}
+              transition={{
+                duration: 2 + Math.random() * 4,
+                delay: Math.random() * 5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          );
+        })}
 
-  {/* MEDIUM STARS */}
-  {Array.from({ length: 80 }).map((_, i) => {
-    const cx = Math.random() * 1200;
-    const cy = Math.random() * 600;
-    const r = Math.random() * 1.3 + 0.6;
+        {/* MEDIUM STARS */}
+        {Array.from({ length: 80 }).map((_, i) => {
+          const cx = Math.random() * 1200;
+          const cy = Math.random() * 600;
+          const r = Math.random() * 1.3 + 0.6;
 
-    return (
-      <motion.circle
-        key={"mid-" + i}
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill="#ffffff"
-        initial={{ opacity: 0.2 }}
-        animate={{ y: [0, -10, 0] }}
-        transition={{
-          duration: 3 + Math.random() * 3,
-          delay: Math.random() * 4,
-          repeat: Infinity,
-        }}
-      />
-    );
-  })}
+          return (
+            <motion.circle
+              key={"mid-" + i}
+              cx={cx}
+              cy={cy}
+              r={r}
+              fill="#ffffff"
+              initial={{ opacity: 0.2 }}
+              animate={{ y: [0, -10, 0] }}
+              transition={{
+                duration: 3 + Math.random() * 3,
+                delay: Math.random() * 4,
+                repeat: Infinity,
+              }}
+            />
+          );
+        })}
 
-  {/* BIG GLOW STARS */}
-  {Array.from({ length: 25 }).map((_, i) => {
-    const cx = Math.random() * 1200;
-    const cy = Math.random() * 600;
-    const r = Math.random() * 2 + 1;
+        {/* BIG GLOW STARS */}
+        {Array.from({ length: 25 }).map((_, i) => {
+          const cx = Math.random() * 1200;
+          const cy = Math.random() * 600;
+          const r = Math.random() * 2 + 1;
 
-    return (
-      <motion.circle
-        key={"big-" + i}
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill="#ffffff"
-        style={{
-          filter: "drop-shadow(0 0 6px white)",
-        }}
-        initial={{ opacity: 0.4 }}
-        animate={{ y: [0, -10, 0] }}
-        transition={{
-          duration: 4 + Math.random() * 4,
-          delay: Math.random() * 5,
-          repeat: Infinity,
-        }}
-      />
-    );
-  })}
-</svg>
-
+          return (
+            <motion.circle
+              key={"big-" + i}
+              cx={cx}
+              cy={cy}
+              r={r}
+              fill="#ffffff"
+              style={{
+                filter: "drop-shadow(0 0 6px white)",
+              }}
+              initial={{ opacity: 0.4 }}
+              animate={{ y: [0, -10, 0] }}
+              transition={{
+                duration: 4 + Math.random() * 4,
+                delay: Math.random() * 5,
+                repeat: Infinity,
+              }}
+            />
+          );
+        })}
+      </svg>
       {/* 3. MASSIVE BACKGROUND WATERMARK (Z-15) */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }} // 100% opacity so it physically blocks the lines
         transition={{ duration: 2 }}
@@ -178,7 +189,7 @@ export default function Auth() {
       {/* 4. MAIN AMBIENT GLOW (Z-15) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-emerald-500/10 rounded-full blur-[150px] pointer-events-none z-15" />
 
-        {/* 5. THE GLASSMORPHIC AUTH CARD (Z-20) */}
+      {/* 5. THE GLASSMORPHIC AUTH CARD (Z-20) */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -189,17 +200,15 @@ export default function Auth() {
         <div className="flex bg-slate-950/50 p-1.5 rounded-full border border-slate-800 mb-10 relative cursor-none">
           <button
             onClick={() => setIsLogin(true)}
-            className={`flex-1 relative z-10 py-2.5 rounded-full text-sm font-bold transition-colors cursor-none ${
-              isLogin ? "text-slate-950" : "text-slate-400 hover:text-white"
-            }`}
+            className={`flex-1 relative z-10 py-2.5 rounded-full text-sm font-bold transition-colors cursor-none ${isLogin ? "text-slate-950" : "text-slate-400 hover:text-white"
+              }`}
           >
             Sign In
           </button>
           <button
             onClick={() => setIsLogin(false)}
-            className={`flex-1 relative z-10 py-2.5 rounded-full text-sm font-bold transition-colors cursor-none ${
-              !isLogin ? "text-slate-950" : "text-slate-400 hover:text-white"
-            }`}
+            className={`flex-1 relative z-10 py-2.5 rounded-full text-sm font-bold transition-colors cursor-none ${!isLogin ? "text-slate-950" : "text-slate-400 hover:text-white"
+              }`}
           >
             Create Account
           </button>

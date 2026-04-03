@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const roadmapSchema = new mongoose.Schema(
   {
@@ -19,6 +19,16 @@ const roadmapSchema = new mongoose.Schema(
       type: String,
       enum: ["Beginner", "Intermediate", "Advanced"],
       default: "Beginner",
+    },
+
+    color: {
+      type: String,
+      default: "#34d399"
+    },
+
+    layoutType: {
+      type: String,
+      default: "auto"
     },
 
     totalXp: {
@@ -46,4 +56,4 @@ const roadmapSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Roadmap", roadmapSchema);
+export default mongoose.model("Roadmap", roadmapSchema);

@@ -1,6 +1,7 @@
-const Activity = require("../models/Activity");
+import Activity from "../models/Activity.js";
 
-exports.getActivity = async (req, res) => {
+export const getActivity = async (req, res) => {
+
   try {
 
     const activity = await Activity.find({
@@ -10,6 +11,9 @@ exports.getActivity = async (req, res) => {
     res.json(activity);
 
   } catch (error) {
+
     res.status(500).json(error);
+
   }
+
 };

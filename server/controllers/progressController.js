@@ -1,9 +1,9 @@
-const User = require("../models/User");
-const Node = require("../models/Node");
-const Activity = require("../models/Activity");
-const Roadmap = require("../models/Roadmap");
+import User from "../models/User.js";
+import Node from "../models/Node.js";
+import Activity from "../models/Activity.js";
+import Roadmap from "../models/Roadmap.js";
 
-exports.getDashboardStats = async (req, res) => {
+export const getDashboardStats = async (req, res) => {
   try {
 
     const user = await User.findById(req.user._id);
@@ -21,7 +21,7 @@ exports.getDashboardStats = async (req, res) => {
   }
 };
 
-exports.completeNode = async (req, res) => {
+export const completeNode = async (req, res) => {
   try {
 
     const node = await Node.findById(req.params.nodeId);
@@ -88,7 +88,7 @@ exports.completeNode = async (req, res) => {
   }
 };
 
-exports.getProgress = async (req, res) => {
+export const getProgress = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
       .populate("completedNodes");

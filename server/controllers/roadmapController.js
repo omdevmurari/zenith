@@ -1,7 +1,7 @@
-const Roadmap = require("../models/Roadmap");
-const User = require("../models/User");
+import Roadmap from "../models/Roadmap.js";
+import User from "../models/User.js";
 
-exports.createRoadmap = async (req, res) => {
+export const createRoadmap = async (req, res) => {
   try {
     const roadmap = await Roadmap.create({
       title: req.body.title,
@@ -17,7 +17,7 @@ exports.createRoadmap = async (req, res) => {
   }
 };
 
-exports.getRoadmaps = async (req, res) => {
+export const getRoadmaps = async (req, res) => {
   try {
     const roadmaps = await Roadmap.find();
 
@@ -27,7 +27,7 @@ exports.getRoadmaps = async (req, res) => {
   }
 };
 
-exports.cloneRoadmap = async (req, res) => {
+export const cloneRoadmap = async (req, res) => {
   try {
 
     const user = await User.findById(req.user._id);
@@ -52,7 +52,7 @@ exports.cloneRoadmap = async (req, res) => {
   }
 };
 
-exports.getUserRoadmaps = async (req, res) => {
+export const getUserRoadmaps = async (req, res) => {
   try {
 
     const user = await User.findById(req.user._id)

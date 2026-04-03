@@ -19,25 +19,25 @@ export default function Explore({ isLoggedIn }: { isLoggedIn: boolean }) {
   // Fetch Roadmaps
   useEffect(() => {
 
-    const fetchRoadmaps = async () => {
-      try {
+  const fetchRoadmaps = async () => {
+    try {
 
-        const res = await fetch(
-          "http://localhost:5000/api/roadmaps"
-        );
+      const res = await fetch(
+        "http://localhost:5000/api/roadmaps"
+      );
 
-        const data = await res.json();
+      const data = await res.json();
 
-        setCommunityRoadmaps(data);
+      setCommunityRoadmaps(data);
 
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    fetchRoadmaps();
+  fetchRoadmaps();
 
-  }, []);
+}, []);
 
 
   const filteredRoadmaps = (communityRoadmaps || []).filter((rm: any) =>
@@ -46,38 +46,37 @@ export default function Explore({ isLoggedIn }: { isLoggedIn: boolean }) {
   );
 
 
-  const handleStart = async (roadmap: any) => {
+  const handleStart = async (roadmap: { _id: any; }) => {
 
-    if (!isLoggedIn) {
-      const confirmLogin = confirm(
-        "Login to save your progress.\n\nContinue as guest?"
-      );
+  if (!isLoggedIn) {
+    alert("Login to save your progress");
+    return;
+  }
 
-      if (!confirmLogin) return;
-      return;
-    }
+  try {
 
-    try {
+    const token = localStorage.getItem("token");
 
-      const token = localStorage.getItem("token");
+    await fetch(
+      "http://localhost:5000/api/user-roadmaps/start",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ roadmapId: roadmap._id })
+      }
+    );
 
-      await fetch(
-        `http://localhost:5000/api/roadmaps/clone/${roadmap._id}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+    alert("Course Started!");
 
-      window.location.href = "/dashboard";
+    window.location.href = "/dashboard";
 
-    } catch (error) {
-      console.error(error);
-    }
-
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 
   return (
@@ -176,8 +175,8 @@ export default function Explore({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <div className="flex justify-between items-center mt-auto">
 
                   <span className="text-xs text-slate-500">
-                    {roadmap.author || "Zenith"}
-                  </span>
+  {roadmap.level || "Beginner"}
+</span>
 
                   <button
                     onClick={() => handleStart(roadmap)}

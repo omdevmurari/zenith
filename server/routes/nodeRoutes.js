@@ -1,12 +1,11 @@
-const express = require("express");
+import express from "express";
+import { createNode, getNodes } from "../controllers/nodeController.js";
+import protect from "../middleware/authMiddleware.js";
+import admin from "../middleware/adminMiddleware.js";
+
 const router = express.Router();
-
-const { createNode, getNodes } = require("../controllers/nodeController");
-
-const protect = require("../middleware/authMiddleware");
-const admin = require("../middleware/adminMiddleware");
 
 router.post("/", protect, admin, createNode);
 router.get("/:roadmapId", getNodes);
 
-module.exports = router;
+export default router;

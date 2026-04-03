@@ -1,7 +1,7 @@
-const Node = require("../models/Node");
-const Roadmap = require("../models/Roadmap");
+import Node from "../models/Node.js";
+import Roadmap from "../models/Roadmap.js";
 
-exports.createNode = async (req, res) => {
+export const createNode = async (req, res) => {
   try {
     const { title, description, xpValue, roadmapId, order } = req.body;
 
@@ -23,7 +23,7 @@ exports.createNode = async (req, res) => {
   }
 };
 
-exports.getNodes = async (req, res) => {
+export const getNodes = async (req, res) => {
   try {
     const nodes = await Node.find({ roadmap: req.params.roadmapId });
 

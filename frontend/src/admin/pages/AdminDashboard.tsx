@@ -29,13 +29,13 @@ const itemVars: Variants = {
 export default function AdminDashboard() {
   return (
     <section className="min-h-screen w-full bg-[#020617] text-slate-200 p-6 md:p-12 font-sans relative z-20 overflow-hidden">
-      
+
       {/* Admin Warning Grid Background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
       <div className="absolute top-0 right-1/4 w-[600px] h-[400px] bg-purple-900/10 rounded-full blur-[150px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        
+
         {/* HEADER */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-slate-800/60 pb-6 gap-6">
           <div>
@@ -54,11 +54,20 @@ export default function AdminDashboard() {
             <button className="px-6 py-2 bg-cyan-500/10 border border-cyan-500/50 text-cyan-400 rounded-lg text-sm font-bold hover:bg-cyan-500/20 transition-colors cursor-none">
               Deploy Roadmap
             </button>
+            <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.href = "/";
+              }}
+              className="px-4 py-2 bg-slate-800 rounded-lg"
+            >
+              Logout
+            </button>
           </div>
         </header>
 
         <motion.div variants={containerVars} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* STATS ROW (Top) */}
           <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
             {systemStats.map((stat, i) => (
@@ -76,16 +85,16 @@ export default function AdminDashboard() {
               <h2 className="text-lg font-bold text-white">Network Traffic & Load</h2>
               <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">Live</span>
             </div>
-            
+
             {/* CSS-based Bar Chart Simulation */}
             <div className="h-64 flex items-end justify-between gap-2 md:gap-4 border-b border-slate-800 pb-4">
               {Array.from({ length: 14 }).map((_, i) => {
                 const height = 20 + Math.random() * 80; // Random height between 20% and 100%
                 return (
                   <div key={i} className="w-full relative group">
-                    <motion.div 
-                      initial={{ height: 0 }} 
-                      animate={{ height: `${height}%` }} 
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: `${height}%` }}
                       transition={{ duration: 1, delay: i * 0.05 }}
                       className="w-full bg-cyan-900/50 rounded-t-sm group-hover:bg-cyan-400 transition-colors relative"
                     >

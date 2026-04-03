@@ -1,10 +1,9 @@
-const express = require("express");
+import express from "express";
+import { getActivity } from "../controllers/activityController.js";
+import protect from "../middleware/authMiddleware.js";
+
 const router = express.Router();
-
-const { getActivity } = require("../controllers/activityController");
-
-const protect = require("../middleware/authMiddleware");
 
 router.get("/", protect, getActivity);
 
-module.exports = router;
+export default router;

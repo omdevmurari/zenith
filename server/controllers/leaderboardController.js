@@ -1,6 +1,6 @@
-const User = require("../models/User");
+import User from "../models/User.js";
 
-exports.getLeaderboard = async (req, res) => {
+export const getLeaderboard = async (req, res) => {
   try {
 
     const users = await User.find()
