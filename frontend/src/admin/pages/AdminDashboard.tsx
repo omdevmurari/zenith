@@ -51,7 +51,10 @@ export default function AdminDashboard() {
             <button className="px-6 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors cursor-none">
               Export Logs
             </button>
-            <button className="px-6 py-2 bg-cyan-500/10 border border-cyan-500/50 text-cyan-400 rounded-lg text-sm font-bold hover:bg-cyan-500/20 transition-colors cursor-none">
+            <button
+              onClick={() => window.location.href = "/admin/builder"}
+              className="px-6 py-2 bg-cyan-500/10 border border-cyan-500/50 text-cyan-400 rounded-lg text-sm font-bold hover:bg-cyan-500/20 transition-colors cursor-none"
+            >
               Deploy Roadmap
             </button>
             <button
