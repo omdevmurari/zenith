@@ -13,6 +13,10 @@ import leaderboardRoutes from "./routes/leaderboardRoutes.js";
 import userRoadmapRoutes from "./routes/userRoadmaps.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoadmaps from "./routes/adminRoadmaps.js";
+import adminStats from "./routes/adminStats.js";
+import adminDashboardRoutes from "./routes/adminDashboard.route.js";
+import adminExportRoutes from "./routes/adminExport.route.js";
+import nodePositionRoutes from "./routes/nodePositions.route.js";
 
 import connectDB from "./config/db.js";
 
@@ -52,6 +56,10 @@ app.use("/api/activity", activityRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/user-roadmaps", userRoadmapRoutes);
 app.use("/api/admin-roadmaps", adminRoadmaps);
+app.use("/api/admin", adminStats);
+app.use("/api/admin", adminDashboardRoutes);
+app.use("/api/admin", adminExportRoutes);
+app.use("/api/nodes", nodePositionRoutes);
 
 const PORT = process.env.PORT || 5000;
 

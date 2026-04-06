@@ -156,7 +156,7 @@ function App() {
       
       {/* CATALOGUE */}
       <div ref={exploreRef}>
-        <Explore isLoggedIn={isLoggedIn} />
+        <Explore isLoggedIn={isLoggedIn} limit={6} />
       </div>
 
       {/* Logged In Only */}

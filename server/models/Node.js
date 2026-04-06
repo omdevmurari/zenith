@@ -24,6 +24,11 @@ const nodeSchema = new mongoose.Schema(
     order: {
       type: Number,
     },
+
+    position:{
+ x:Number,
+ y:Number
+}
   },
   { timestamps: true }
 );

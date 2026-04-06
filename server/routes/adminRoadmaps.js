@@ -28,5 +28,33 @@ router.get("/", protect, admin, async (req, res) => {
   }
 });
 
+router.patch("/:id/toggle", async (req, res) => {
+
+  try {
+
+    const roadmap = await Roadmap.findById(req.params.id);
+
+    if (!roadmap) {
+      return res.status(404).json({
+        message: "Roadmap not found"
+      });
+    }
+
+    // Toggle value
+    roadmap.isActive = !roadmap.isActive;
+
+    await roadmap.save();
+
+    res.json(roadmap);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+
+});
 
 export default router;

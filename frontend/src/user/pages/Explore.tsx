@@ -11,7 +11,13 @@ const itemVars = {
   show: { opacity: 1, y: 0, transition: { stiffness: 300, damping: 24 } }
 };
 
-export default function Explore({ isLoggedIn }: { isLoggedIn: boolean }) {
+export default function Explore({
+  isLoggedIn,
+  limit
+}: {
+  isLoggedIn: boolean;
+  limit?: number;
+}) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [communityRoadmaps, setCommunityRoadmaps] = useState<any[]>([]);
@@ -19,64 +25,66 @@ export default function Explore({ isLoggedIn }: { isLoggedIn: boolean }) {
   // Fetch Roadmaps
   useEffect(() => {
 
-  const fetchRoadmaps = async () => {
+    const fetchRoadmaps = async () => {
+      try {
+
+        const res = await fetch(
+          "http://localhost:5000/api/roadmaps"
+        );
+
+        const data = await res.json();
+
+        setCommunityRoadmaps(data);
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchRoadmaps();
+
+  }, []);
+
+
+  const filteredRoadmaps = (communityRoadmaps || [])
+    .filter((rm: any) =>
+      rm.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rm.category?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .slice(0, limit || communityRoadmaps.length);
+
+
+  const handleStart = async (roadmap: { _id: any; }) => {
+
+    if (!isLoggedIn) {
+      alert("Login to save your progress");
+      return;
+    }
+
     try {
 
-      const res = await fetch(
-        "http://localhost:5000/api/roadmaps"
+      const token = localStorage.getItem("token");
+
+      await fetch(
+        "http://localhost:5000/api/user-roadmaps/start",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ roadmapId: roadmap._id })
+        }
       );
 
-      const data = await res.json();
+      alert("Course Started!");
 
-      setCommunityRoadmaps(data);
+      window.location.href = "/dashboard";
 
     } catch (error) {
       console.error(error);
     }
   };
-
-  fetchRoadmaps();
-
-}, []);
-
-
-  const filteredRoadmaps = (communityRoadmaps || []).filter((rm: any) =>
-    rm.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    rm.category?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-
-  const handleStart = async (roadmap: { _id: any; }) => {
-
-  if (!isLoggedIn) {
-    alert("Login to save your progress");
-    return;
-  }
-
-  try {
-
-    const token = localStorage.getItem("token");
-
-    await fetch(
-      "http://localhost:5000/api/user-roadmaps/start",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ roadmapId: roadmap._id })
-      }
-    );
-
-    alert("Course Started!");
-
-    window.location.href = "/dashboard";
-
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 
   return (
@@ -135,13 +143,14 @@ export default function Explore({ isLoggedIn }: { isLoggedIn: boolean }) {
           {filteredRoadmaps?.map((roadmap: any, index: number) => {
 
             const locked = !isLoggedIn && index > 1;
+            const disabled = roadmap.isActive === false;
 
             return (
               <motion.div
                 key={roadmap._id}
                 variants={itemVars}
                 className={`group relative bg-slate-900/40 border border-slate-800 rounded-[2rem] p-8 backdrop-blur-sm transition-all duration-300 flex flex-col h-full overflow-hidden
-                ${locked ? "opacity-60" : "hover:bg-slate-800/40"}`}
+                ${locked || disabled ? "opacity-60" : "hover:bg-slate-800/40"}`}
               >
 
                 {locked && (
@@ -149,6 +158,19 @@ export default function Explore({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <p className="text-white font-bold">
                       Login to Unlock
                     </p>
+                  </div>
+                )}
+
+                {disabled && (
+                  <div className="absolute inset-0 backdrop-blur-md bg-black/40 flex items-center justify-center z-20">
+                    <div className="text-center">
+                      <p className="text-white font-bold text-lg">
+                        Sorry
+                      </p>
+                      <p className="text-slate-300 text-sm">
+                        Not available (for now)
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -175,12 +197,12 @@ export default function Explore({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <div className="flex justify-between items-center mt-auto">
 
                   <span className="text-xs text-slate-500">
-  {roadmap.level || "Beginner"}
-</span>
+                    {roadmap.level || "Beginner"}
+                  </span>
 
                   <button
                     onClick={() => handleStart(roadmap)}
-                    disabled={locked}
+                    disabled={locked || disabled}
                     className="text-sm font-bold text-white bg-white/5 hover:bg-cyan-500 hover:text-black px-4 py-2 rounded-lg transition-all"
                   >
                     Start Course
@@ -196,6 +218,17 @@ export default function Explore({ isLoggedIn }: { isLoggedIn: boolean }) {
         </motion.div>
 
       </div>
+
+      {limit && (
+  <div className="mt-10 text-center">
+    <button
+      onClick={() => window.location.href = "/explore"}
+      className="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl"
+    >
+      View All Roadmaps
+    </button>
+  </div>
+)}
 
     </section>
   );
