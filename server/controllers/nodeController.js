@@ -6,10 +6,10 @@ export const getNodes = async (req, res) => {
   try {
     // Note: Assuming your route is /api/nodes/:roadmapId
     const { roadmapId } = req.params;
-    
+
     // Find all nodes that belong to this roadmap
     const nodes = await Node.find({ roadmap: roadmapId });
-    
+
     res.status(200).json(nodes);
   } catch (error) {
     console.error("Error fetching nodes:", error);
@@ -30,15 +30,15 @@ export const createNode = async (req, res) => {
       roadmap,
       order
     });
-    
+
     const savedNode = await newNode.save();
 
     // Push the new Node's _id into the Roadmap's nodes array
     if (roadmap) {
       await Roadmap.findByIdAndUpdate(
-        roadmap, 
+        roadmap,
         { $push: { nodes: savedNode._id } },
-        { new: true }
+        { returnDocument: 'after' }
       );
     }
 
@@ -53,12 +53,12 @@ export const createNode = async (req, res) => {
 export const updateNode = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Find the node by ID and update it
     const updatedNode = await Node.findByIdAndUpdate(
       id,
       req.body,
-      { new: true } // Returns the updated document
+      { returnDocument: 'after' } // Returns the updated document
     );
 
     if (!updatedNode) {
@@ -79,7 +79,7 @@ export const deleteNode = async (req, res) => {
 
     // Find the node first to get its parent roadmap ID
     const nodeToDelete = await Node.findById(id);
-    
+
     if (!nodeToDelete) {
       return res.status(404).json({ message: "Node not found" });
     }
@@ -99,5 +99,32 @@ export const deleteNode = async (req, res) => {
   } catch (error) {
     console.error("Error deleting node:", error);
     res.status(500).json({ message: "Server error while deleting node." });
+  }
+};
+
+// --- 5. REORDER NODES ---
+export const reorderNodes = async (req, res) => {
+  try {
+    const { nodes } = req.body; // Array of nodes with their new order
+
+    if (!Array.isArray(nodes) || nodes.length === 0) {
+      return res.status(400).json({ message: "Invalid nodes array" });
+    }
+
+    // Update each node's order based on position in array
+    const updatePromises = nodes.map((node, index) =>
+      Node.findByIdAndUpdate(
+        node._id,
+        { order: index },
+        { returnDocument: 'after' }
+      )
+    );
+
+    const updatedNodes = await Promise.all(updatePromises);
+
+    res.status(200).json(updatedNodes);
+  } catch (error) {
+    console.error("Error reordering nodes:", error);
+    res.status(500).json({ message: "Server error while reordering nodes." });
   }
 };

@@ -53,38 +53,27 @@ export default function Explore({
     )
     .slice(0, limit || communityRoadmaps.length);
 
-
   const handleStart = async (roadmap: { _id: any; }) => {
 
-    if (!isLoggedIn) {
-      alert("Login to save your progress");
-      return;
-    }
+const token = localStorage.getItem("token");
 
-    try {
+await fetch(
+"http://localhost:5000/api/user-roadmaps/start",
+{
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+Authorization: `Bearer ${token}`
+},
+body: JSON.stringify({
+roadmapId: roadmap._id
+})
+}
+);
 
-      const token = localStorage.getItem("token");
+alert("Course Started");
 
-      await fetch(
-        "http://localhost:5000/api/user-roadmaps/start",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ roadmapId: roadmap._id })
-        }
-      );
-
-      alert("Course Started!");
-
-      window.location.href = "/dashboard";
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
+};
 
 
   return (

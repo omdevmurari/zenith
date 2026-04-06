@@ -4,52 +4,57 @@ import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Start Course
+// START COURSE
 router.post("/start", auth, async (req, res) => {
-  try {
+try {
 
-    const { roadmapId } = req.body;
+const { roadmapId } = req.body;
 
-    const exists = await UserRoadmap.findOne({ userId: req.user.id, roadmapId });
+if (!roadmapId) {
+  return res.status(400).json({
+    message: "roadmapId required"
+  });
+}
 
-    const roadmaps = await UserRoadmap.find({
-  user: req.user.id
-}).populate("roadmapId");
-
-    if (exists) {
-      return res.json(exists);
-    }
-
-const roadmap = new UserRoadmap({
- user: req.user._id,
- roadmapId: roadmapId,
- progress: 0
+// Check existing
+const exists = await UserRoadmap.findOne({
+  userId: req.user.id,
+  roadmapId
 });
 
-await roadmap.save();
+if (exists) {
+  return res.json(exists);
+}
 
-res.json(roadmap);
-
-    await newRoadmap.save();
-
-    res.json(newRoadmap);
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+const newUserRoadmap = new UserRoadmap({
+  userId: req.user.id,
+  roadmapId,
+  progress: 0
 });
 
+await newUserRoadmap.save();
 
-// Get My Roadmaps
+res.json(newUserRoadmap);
+
+} catch (error) {
+console.error(error);
+res.status(500).json({ message: "Server error" });
+}
+});
+
+// GET USER ROADMAPS
 router.get("/my", auth, async (req, res) => {
+try {
 
-  const roadmaps = await UserRoadmap.find({
-    userId: req.user.id
-  }).populate("roadmapId");
+const roadmaps = await UserRoadmap
+  .find({ userId: req.user.id })
+  .populate("roadmapId");
 
-  res.json(roadmaps);
+res.json(roadmaps);
 
-  console.log(roadmaps);
+} catch (error) {
+res.status(500).json({ message: "Server error" });
+}
 });
 
 export default router;

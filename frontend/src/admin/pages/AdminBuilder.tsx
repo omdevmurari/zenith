@@ -74,6 +74,7 @@ export default function AdminBuilder() {
                             <RoadmapDetails
                                 {...state}
                                 toggleRoadmapStatus={api.toggleRoadmapStatus}
+                                reorderNodes={api.reorderNodes}
                             />
                         )}
 

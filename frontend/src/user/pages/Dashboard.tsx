@@ -181,6 +181,67 @@ fetchData();
           </div>
         </motion.header>
 
+        {/* Continue Learning Hero */}
+{roadmaps.length > 0 && (
+
+<motion.div
+initial={{ opacity: 0, y: 20 }}
+whileInView={{ opacity: 1, y: 0 }}
+viewport={{ once: true }}
+className="mb-8 bg-slate-900/40 border border-slate-800/80 rounded-[2rem] p-8 backdrop-blur-sm shadow-xl"
+
+>
+
+<div className="flex justify-between items-center">
+
+<div>
+
+<p className="text-emerald-400 text-xs uppercase tracking-widest font-bold">
+Continue Learning
+</p>
+
+<h2 className="text-2xl font-bold text-white mt-2">
+{roadmaps?.[0]?.roadmapId?.title || "Your Journey"}
+</h2>
+
+<p className="text-slate-400 text-sm mt-1">
+{roadmaps?.[0]?.progress || 0}% Completed
+</p>
+
+</div>
+
+<button
+onClick={() =>
+window.location.href =
+`/roadmap/${roadmaps?.[0]?.roadmapId?._id}`
+}
+className="px-6 py-3 bg-emerald-500 text-black rounded-xl font-semibold hover:scale-105 transition"
+
+>
+
+Continue → </button>
+
+</div>
+
+<div className="w-full h-2 bg-slate-800 rounded-full mt-6">
+
+<motion.div
+initial={{ width: 0 }}
+whileInView={{
+width: `${roadmaps?.[0]?.progress || 0}%`
+}}
+viewport={{ once: true }}
+transition={{ duration: 1 }}
+className="h-full bg-emerald-400"
+/>
+
+</div>
+
+</motion.div>
+
+)}
+
+
         <div className="relative min-h-[600px]">
           <AnimatePresence mode="wait">
             
@@ -244,46 +305,66 @@ fetchData();
                 {/* Sidebar Roadmaps */}
                 <motion.div variants={cardVars} className="bg-slate-900/40 border border-slate-800/80 rounded-[2rem] p-8 backdrop-blur-sm h-fit shadow-xl">
                   <h2 className="text-lg font-bold text-white mb-8">Active Roadmaps</h2>
-                  <div className="space-y-8">
-                    {roadmaps.length === 0 && (
-                      <p className="text-slate-500 text-sm">
-                        No active roadmaps yet
-                      </p>
-                    )}
+                  <div className="space-y-6">
 
-                    {roadmaps.map((item: any, i) => (
+{roadmaps.length === 0 && (
+  <p className="text-slate-500 text-sm">
+    No active roadmaps yet
+  </p>
+)}
 
-                      <div key={item._id || i} className="group cursor-none">
+{roadmaps.map((item: any, i) => (
 
-                        <div className="flex justify-between text-sm mb-3">
+<div
+key={item._id || i}
+className="group p-4 rounded-xl bg-slate-800/30 border border-slate-800 hover:border-emerald-500/30 transition-all"
+>
 
-                          <span className="text-slate-300 font-bold group-hover:text-white transition-colors">
-                            {item?.roadmapId?.title ?? "Untitled Roadmap"}
-                          </span>
+<div className="flex justify-between items-center mb-3">
 
-                          <span className="text-slate-400 font-mono bg-slate-800 px-2 py-0.5 rounded text-xs">
-                            {Math.min(item?.progress || 0, 100)}%
-                          </span>
+<div>
+<span className="text-slate-200 font-semibold block">
+{item?.roadmapId?.title ?? "Untitled Roadmap"}
+</span>
 
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            whileInView={{
-                              width: `${Math.min(item?.progress || 0, 100)}%`
-                            }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 1, delay: 0.2 }}
-                            className="h-full bg-emerald-400 shadow-[0_0_10px_#34d399]"
-                          />
+<span className="text-xs text-slate-500">
+Continue your journey
+</span>
 
-                        </div>
+</div>
 
-                      </div>
+<button
+onClick={() => window.location.href = `/roadmap/${item?.roadmapId?._id}`}
+className="text-xs px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition"
+>
+Continue →
+</button>
 
-                    ))}
+</div>
 
-                  </div>
+<div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+
+<motion.div
+initial={{ width: 0 }}
+whileInView={{
+width: `${Math.min(item?.progress || 0, 100)}%`
+}}
+viewport={{ once: true }}
+transition={{ duration: 1 }}
+className="h-full bg-emerald-400"
+/>
+
+</div>
+
+<div className="text-xs text-slate-500 mt-2">
+{Math.min(item?.progress || 0, 100)}% completed
+</div>
+
+</div>
+
+))}
+
+</div>
                 </motion.div>
               </motion.div>
             )}

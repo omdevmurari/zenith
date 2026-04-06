@@ -1,5 +1,5 @@
 import express from "express";
-import { createNode, getNodes, updateNode, deleteNode } from "../controllers/nodeController.js";
+import { createNode, getNodes, updateNode, deleteNode, reorderNodes } from "../controllers/nodeController.js";
 
 const router = express.Router();
 
@@ -8,6 +8,9 @@ router.get("/:roadmapId", getNodes);
 
 // Create a new node
 router.post("/", createNode);
+
+// Reorder nodes
+router.post("/reorder/batch", reorderNodes);
 
 // Update an existing node
 router.put("/:id", updateNode);

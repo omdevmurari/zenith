@@ -279,28 +279,55 @@ export function useAdminAPI(state: any) {
         setDeleteModal(null);
     };
 
-    const updateNodePositions = async (nodes:any[]) => {
+    const updateNodePositions = async (nodes: any[]) => {
 
-  try {
+        try {
 
-    await fetch(
-      "http://localhost:5000/api/nodes/positions",
-      {
-        method:"PATCH",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify(nodes)
-      }
-    );
+            await fetch(
+                "http://localhost:5000/api/nodes/positions",
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(nodes)
+                }
+            );
 
-  } catch(err) {
+        } catch (err) {
 
-    console.log(err);
+            console.log(err);
 
-  }
+        }
 
-};
+    };
+
+    const reorderNodes = async (orderedNodes: any[]) => {
+        try {
+            const res = await fetch(
+                "http://localhost:5000/api/nodes/reorder/batch",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...getAuthHeader()
+                    },
+                    body: JSON.stringify({ nodes: orderedNodes })
+                }
+            );
+
+            if (res.ok) {
+                const data = await res.json();
+                setNodes(data);
+                showToast("Nodes reordered successfully", "success");
+            } else {
+                showToast("Failed to reorder nodes", "error");
+            }
+        } catch (err) {
+            console.error("Error reordering nodes:", err);
+            showToast("Error reordering nodes", "error");
+        }
+    };
 
     return {
         handleDeployRoadmap,
@@ -309,6 +336,7 @@ export function useAdminAPI(state: any) {
         toggleRoadmapStatus,
         dashboardStats,
         recentActivity,
-        updateNodePositions
+        updateNodePositions,
+        reorderNodes
     };
 }
