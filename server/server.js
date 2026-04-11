@@ -1,6 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import mongoose from "mongoose";
+
+dotenv.config();
 
 import protect from "./middleware/authMiddleware.js";
 import admin from "./middleware/adminMiddleware.js";
@@ -21,8 +24,6 @@ import nodePositionRoutes from "./routes/nodePositions.route.js";
 import progressRoutes from "./routes/progress.js";
 
 import connectDB from "./config/db.js";
-
-dotenv.config();
 
 connectDB();
 
