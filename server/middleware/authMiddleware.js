@@ -1,6 +1,7 @@
+import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
 
     const authHeader = req.headers.authorization;
@@ -18,6 +19,21 @@ const protect = (req, res, next) => {
       process.env.JWT_SECRET
     );
 
+    const user = await User.findById(decoded.id).select("role isDisabled");
+
+    if (!user) {
+      return res.status(401).json({
+        message: "User not found"
+      });
+    }
+
+    if (user.isDisabled) {
+      return res.status(403).json({
+        message: "Account disabled"
+      });
+    }
+
+    decoded.role = user.role;
     req.user = decoded;
 
     next();

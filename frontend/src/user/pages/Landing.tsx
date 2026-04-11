@@ -49,23 +49,40 @@ function App() {
 
         {/* Logout Button */}
 {isLoggedIn && (
-  <button
-    onClick={handleLogout}
-    className="
-    absolute top-6 right-8 z-50
-    px-5 py-2
-    bg-slate-900
-    border border-slate-700
-    hover:border-red-400
-    hover:text-red-400
-    rounded-xl
-    transition-all
-    text-sm
-    font-semibold
-    "
-  >
-    Logout
-  </button>
+  <div className="absolute right-8 top-6 z-50 flex items-center gap-3">
+    <button
+      onClick={() => (window.location.href = "/profile")}
+      className="
+      px-5 py-2
+      bg-slate-900
+      border border-slate-700
+      hover:border-cyan-400
+      hover:text-cyan-300
+      rounded-xl
+      transition-all
+      text-sm
+      font-semibold
+      "
+    >
+      Profile
+    </button>
+    <button
+      onClick={handleLogout}
+      className="
+      px-5 py-2
+      bg-slate-900
+      border border-slate-700
+      hover:border-red-400
+      hover:text-red-400
+      rounded-xl
+      transition-all
+      text-sm
+      font-semibold
+      "
+    >
+      Logout
+    </button>
+  </div>
 )}
 
         {/* Background glow centered perfectly in the screen */}
@@ -104,7 +121,7 @@ function App() {
                 onClick={scrollToExplore}
                 className="px-8 py-4 bg-emerald-500 rounded-xl font-bold"
               >
-                Try Guest Mode
+                Explore Roadmaps
               </button>
             )}
 
@@ -156,20 +173,26 @@ function App() {
       
       {/* CATALOGUE */}
       <div ref={exploreRef}>
-        <Explore isLoggedIn={isLoggedIn} limit={6} />
+        <Explore
+          isLoggedIn={isLoggedIn}
+          limit={6}
+          onRequireLogin={scrollToAuth}
+        />
       </div>
 
       {/* Logged In Only */}
       {isLoggedIn && (
         <>
-          <Roadmap />
-          <Dashboard />
+          <Roadmap isLoggedIn={isLoggedIn} />
+          <Dashboard showBack={false} />
         </>
       )}
 
       {/* Auth */}
       {!isLoggedIn && (
+        <div ref={authRef} className="w-full">
           <Auth />
+        </div>
       )}
 
     </div>

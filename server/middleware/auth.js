@@ -1,6 +1,7 @@
+import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
-export default function auth(req, res, next) {
+export default async function auth(req, res, next) {
 
   try {
 
@@ -17,6 +18,21 @@ export default function auth(req, res, next) {
       process.env.JWT_SECRET || "secret"
     );
 
+    const user = await User.findById(decoded.id).select("role isDisabled");
+
+    if (!user) {
+      return res.status(401).json({
+        message: "User not found"
+      });
+    }
+
+    if (user.isDisabled) {
+      return res.status(403).json({
+        message: "Account disabled"
+      });
+    }
+
+    decoded.role = user.role;
     req.user = decoded;
 
     next();

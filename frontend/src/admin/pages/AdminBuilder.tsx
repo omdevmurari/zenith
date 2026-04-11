@@ -68,7 +68,7 @@ export default function AdminBuilder() {
                     {/* Right Pane */}
                     <motion.div
                         layout
-                        className="w-full lg:w-2/3 bg-slate-900/50 border border-slate-700 rounded-3xl p-8"
+                        className="w-full min-w-0 lg:w-2/3 overflow-hidden bg-slate-900/50 border border-slate-700 rounded-3xl p-8"
                     >
                         {state.rightPaneMode === "standby" && state.selectedRoadmap && (
                             <RoadmapDetails
@@ -104,10 +104,12 @@ export default function AdminBuilder() {
                         )}
 
                         {state.selectedRoadmap && (
-                            <ZenithMap
-                                nodes={state.nodes}
-                                onDragEnd={api.updateNodePositions}
-                            />
+                            <div className="mt-8 border-t border-slate-800 pt-6 min-w-0">
+                                <ZenithMap
+                                    nodes={state.nodes}
+                                    onDragEnd={api.updateNodePositions}
+                                />
+                            </div>
                         )}
 
                     </motion.div>

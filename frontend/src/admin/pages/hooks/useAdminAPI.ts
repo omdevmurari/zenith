@@ -21,6 +21,7 @@ export function useAdminAPI(state: any) {
         nodes,
         setNodes,
         selectedRoadmapId,
+        setSelectedRoadmapId,
         activeNodeId,
         rightPaneMode,
         setActiveNodeId,
@@ -131,9 +132,10 @@ export function useAdminAPI(state: any) {
         const payload = {
             title: formData.get("title"),
             category: formData.get("category"),
+            difficulty: formData.get("difficulty"),
             totalXp: Number(formData.get("totalXp")),
             description: formData.get("description"),
-            isPublished: formData.get("isPublished") === "on"
+            published: formData.get("published") === "on"
         };
 
         try {
@@ -153,6 +155,8 @@ export function useAdminAPI(state: any) {
                 const saved = await res.json();
 
                 setRoadmaps([...roadmaps, saved]);
+                setSelectedRoadmapId(saved._id);
+                setNodes([]);
                 setRightPaneMode("create-node");
                 showToast("Roadmap created");
             }

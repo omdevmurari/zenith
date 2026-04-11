@@ -4,6 +4,7 @@
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
-    "framer-motion": "^12.38.0"
+    "framer-motion": "^12.38.0",
+    "nodemailer": "^8.0.5"
   }
 }

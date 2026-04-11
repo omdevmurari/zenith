@@ -1,6 +1,5 @@
 import { motion, type Variants } from "framer-motion";
 import { useEffect, useState } from "react";
-import CustomCursor from "../../components/CustomCursor";
 
 const containerVars: Variants = {
   hidden: { opacity: 0 },
@@ -114,6 +113,12 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex gap-4">
+            <button
+              onClick={() => window.location.href = "/admin/users"}
+              className="px-6 py-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 rounded-lg text-sm font-bold hover:bg-emerald-500/20"
+            >
+              View Users
+            </button>
 
             <button
               onClick={() => {

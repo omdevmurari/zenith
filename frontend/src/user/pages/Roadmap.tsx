@@ -1,108 +1,311 @@
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-
-// Fully mapped out constellation coordinates (X, Y percentages)
-const nodes = [
-  { id: 1, x: 20, y: 20, title: "Internet Fundamentals", desc: "DNS, Hosting, and TCP/IP.", status: "completed" },
-  { id: 2, x: 50, y: 15, title: "Frontend Core", desc: "HTML5, CSS3, ES6+ JavaScript.", status: "completed" },
-  { id: 3, x: 80, y: 30, title: "React & UI", desc: "Hooks, State, and Framer Motion.", status: "in-progress" },
-  { id: 4, x: 35, y: 55, title: "Backend & APIs", desc: "Node.js, Express routing.", status: "locked" },
-  { id: 5, x: 65, y: 65, title: "Database Architecture", desc: "MongoDB and Relational Data.", status: "locked" },
-  { id: 6, x: 50, y: 85, title: "Full-Stack Deployment", desc: "Vercel, AWS, and CI/CD pipelines.", status: "locked" },
-];
-
-// Define which nodes connect to which (to draw the constellation lines)
-const connections = [
-  { from: 1, to: 2 },
-  { from: 2, to: 3 },
-  { from: 2, to: 4 },
-  { from: 4, to: 5 },
-  { from: 3, to: 5 },
-  { from: 5, to: 6 },
-];
+import ZenithMap from "../../components/admin/ZenithMap";
 
 interface RoadmapProps {
   isLoggedIn?: boolean;
 }
 
-export default function Roadmap({ isLoggedIn: _isLoggedIn }: RoadmapProps) {
-  // isLoggedIn is accepted for API compatibility; roadmap is currently read-only
-  return (
-    <section className="relative w-full h-[800px] bg-[#020617] overflow-hidden flex items-center justify-center border-t border-slate-800/50 mt-20 shadow-[inset_0_100px_100px_rgba(2,6,23,1)]">
-      
-      {/* Ambient background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-900/10 rounded-full blur-[150px] pointer-events-none" />
+export default function Roadmap({ isLoggedIn }: RoadmapProps) {
+  const [loading, setLoading] = useState(true);
+  const [activeRoadmap, setActiveRoadmap] = useState<any>(null);
+  const [nodes, setNodes] = useState<any[]>([]);
+  const [completedNodeIds, setCompletedNodeIds] = useState<string[]>([]);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
-      <div className="absolute top-12 left-12 z-20">
-        <h2 className="text-sm font-bold text-emerald-500 tracking-[0.3em] uppercase mb-2">Sector 7G</h2>
-        <h3 className="text-4xl font-light text-slate-200 tracking-widest uppercase">Zenith Mapping</h3>
-      </div>
+  useEffect(() => {
+    const token = localStorage.getItem("token");
 
-      {/* The Constellation Canvas */}
-      <div className="relative w-full max-w-6xl h-full mx-auto">
-        
-        {/* Draw the SVG Connecting Lines */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          {connections.map((conn, i) => {
-            const startNode = nodes.find(n => n.id === conn.from)!;
-            const endNode = nodes.find(n => n.id === conn.to)!;
-            const isCompleted = startNode.status === "completed" && endNode.status === "completed";
-            
-            return (
-              <motion.line 
-                key={i}
-                x1={`${startNode.x}%`} y1={`${startNode.y}%`} 
-                x2={`${endNode.x}%`} y2={`${endNode.y}%`} 
-                stroke={isCompleted ? "#34d399" : "#334155"} 
-                strokeWidth={isCompleted ? "2" : "1"} 
-                strokeDasharray={isCompleted ? "none" : "4,4"}
-                initial={{ pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.5, ease: "easeInOut", delay: i * 0.2 }}
-              />
-            );
-          })}
-        </svg>
+    if (!isLoggedIn || !token) {
+      setLoading(false);
+      setActiveRoadmap(null);
+      setNodes([]);
+      setCompletedNodeIds([]);
+      return;
+    }
 
-        {/* Render the Stars (Nodes) */}
-        {nodes.map((node, i) => {
-          const isCompleted = node.status === "completed";
-          const isInProgress = node.status === "in-progress";
+    const fetchSnapshot = async () => {
+      try {
+        const roadmapRes = await fetch(
+          "http://localhost:5000/api/user-roadmaps/my",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
 
-          return (
-            <motion.div 
-              key={node.id}
-              className="absolute group cursor-none z-10"
-              style={{ left: `${node.x}%`, top: `${node.y}%`, transform: 'translate(-50%, -50%)' }}
-              initial={{ scale: 0, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 + 0.5, type: "spring" }}
-            >
-              {/* The Star */}
-              <div className="relative flex items-center justify-center w-12 h-12 -ml-6 -mt-6">
-                <div className={`w-4 h-4 rounded-full transition-all duration-300 group-hover:scale-150
-                  ${isCompleted ? 'bg-emerald-400 shadow-[0_0_20px_#34d399]' : ''}
-                  ${isInProgress ? 'bg-cyan-400 shadow-[0_0_30px_#22d3ee] animate-pulse' : ''}
-                  ${node.status === 'locked' ? 'bg-slate-700 border-2 border-slate-600' : ''}
-                `} />
-              </div>
+        if (!roadmapRes.ok) {
+          setLoading(false);
+          return;
+        }
 
-              {/* The Hover Tooltip (Glassmorphism) */}
-              <div className={`absolute top-8 left-1/2 -translate-x-1/2 w-64 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 pointer-events-none
-                bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 p-5 rounded-2xl shadow-2xl
-              `}>
-                <span className={`text-[10px] font-bold uppercase tracking-widest mb-2 block
-                  ${isCompleted ? 'text-emerald-400' : isInProgress ? 'text-cyan-400' : 'text-slate-500'}
-                `}>
-                  {node.status.replace('-', ' ')}
-                </span>
-                <h4 className="text-white font-bold text-lg leading-tight mb-2">{node.title}</h4>
-                <p className="text-slate-400 text-sm">{node.desc}</p>
-              </div>
-            </motion.div>
+        const roadmapData = await roadmapRes.json();
+        const sortedRoadmaps = (Array.isArray(roadmapData) ? roadmapData : [])
+          .sort(
+            (firstRoadmap: any, secondRoadmap: any) =>
+              new Date(secondRoadmap.startedAt || secondRoadmap.updatedAt || 0).getTime() -
+              new Date(firstRoadmap.startedAt || firstRoadmap.updatedAt || 0).getTime()
           );
-        })}
+
+        const latestRoadmap = sortedRoadmaps[0];
+
+        if (!latestRoadmap?.roadmapId?._id) {
+          setLoading(false);
+          return;
+        }
+
+        setActiveRoadmap(latestRoadmap);
+
+        const [nodeRes, progressRes] = await Promise.all([
+          fetch(
+            `http://localhost:5000/api/nodes/${latestRoadmap.roadmapId._id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
+          ),
+          fetch(
+            "http://localhost:5000/api/progress",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
+          )
+        ]);
+
+        const nodeData = nodeRes.ok ? await nodeRes.json() : [];
+        const orderedNodes = (Array.isArray(nodeData) ? nodeData : [])
+          .sort((firstNode: any, secondNode: any) => (firstNode.order || 0) - (secondNode.order || 0));
+
+        setNodes(orderedNodes);
+        setSelectedNodeId(orderedNodes[0]?._id || null);
+
+        if (progressRes.ok) {
+          const progressData = await progressRes.json();
+          const roadmapNodeIds = new Set(
+            orderedNodes.map((node: any) => node._id?.toString())
+          );
+
+          const completedIds = (progressData.completedNodes || [])
+            .map((node: any) => typeof node === "string" ? node : node._id)
+            .filter((nodeId: string) => roadmapNodeIds.has(nodeId?.toString()));
+
+          setCompletedNodeIds(completedIds);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSnapshot();
+  }, [isLoggedIn]);
+
+  const nextUnlockedNodeId = useMemo(
+    () => nodes.find((node: any) => !completedNodeIds.includes(node._id))?._id || null,
+    [completedNodeIds, nodes]
+  );
+
+  const roadmapNodes = useMemo(
+    () => nodes.map((node: any) => ({
+      ...node,
+      status: completedNodeIds.includes(node._id)
+        ? "completed"
+        : node._id === nextUnlockedNodeId
+          ? "in_progress"
+          : "locked"
+    })),
+    [completedNodeIds, nextUnlockedNodeId, nodes]
+  );
+
+  const selectedNode =
+    roadmapNodes.find((node: any) => node._id === selectedNodeId) ||
+    roadmapNodes[0] ||
+    null;
+
+  const completedCount = roadmapNodes.filter((node: any) => node.status === "completed").length;
+  const pendingCount = roadmapNodes.length - completedCount;
+
+  return (
+    <section className="relative w-full min-h-[820px] bg-[#020617] overflow-hidden border-t border-slate-800/50 mt-20 shadow-[inset_0_100px_100px_rgba(2,6,23,1)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.12),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(34,211,238,0.08),_transparent_30%)] pointer-events-none" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-16 md:px-12">
+        <div className="mb-10">
+          <h2 className="mb-2 text-sm font-bold text-emerald-500 tracking-[0.3em] uppercase">
+            Sector 7G
+          </h2>
+          <h3 className="text-4xl font-light text-slate-200 tracking-widest uppercase">
+            Zenith Mapping
+          </h3>
+          <p className="mt-4 max-w-2xl text-slate-400">
+            Live constellation view of your latest active roadmap, with completed and pending milestones.
+          </p>
+        </div>
+
+        {!isLoggedIn && (
+          <div className="rounded-[2rem] border border-slate-800 bg-slate-900/40 p-10 text-center">
+            <p className="text-lg font-semibold text-white">
+              Login to unlock your live Zenith map
+            </p>
+            <p className="mt-3 text-sm text-slate-400">
+              Your latest roadmap constellation, completion state, and next pending node will appear here.
+            </p>
+          </div>
+        )}
+
+        {isLoggedIn && loading && (
+          <div className="rounded-[2rem] border border-slate-800 bg-slate-900/40 p-10 text-center text-slate-400">
+            Loading active roadmap snapshot...
+          </div>
+        )}
+
+        {isLoggedIn && !loading && !activeRoadmap && (
+          <div className="rounded-[2rem] border border-slate-800 bg-slate-900/40 p-10 text-center">
+            <p className="text-lg font-semibold text-white">
+              No active roadmap yet
+            </p>
+            <p className="mt-3 text-sm text-slate-400">
+              Start a roadmap from Explore and your live constellation will appear here.
+            </p>
+          </div>
+        )}
+
+        {isLoggedIn && !loading && activeRoadmap && (
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="rounded-[2rem] border border-slate-800 bg-slate-900/35 p-4 md:p-5">
+              <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.28em] text-cyan-400">
+                    Last Active Roadmap
+                  </p>
+                  <h4 className="mt-2 text-2xl font-black text-white">
+                    {activeRoadmap.roadmapId?.title || "Untitled Roadmap"}
+                  </h4>
+                  <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-400">
+                    {activeRoadmap.roadmapId?.description || "No roadmap description available."}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
+                    <div className="text-xs uppercase tracking-[0.24em] text-emerald-300/70">
+                      Completed
+                    </div>
+                    <div className="mt-1 text-2xl font-black text-emerald-300">
+                      {completedCount}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3">
+                    <div className="text-xs uppercase tracking-[0.24em] text-slate-500">
+                      Pending
+                    </div>
+                    <div className="mt-1 text-2xl font-black text-slate-200">
+                      {pendingCount}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <ZenithMap
+                nodes={roadmapNodes}
+                onNodeClick={(node: any) => setSelectedNodeId(node._id)}
+                heightClass="h-[280px] md:h-[320px]"
+              />
+            </div>
+
+            <div className="space-y-5">
+              <div className="rounded-[2rem] border border-slate-800 bg-slate-900/35 p-6">
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-cyan-400">
+                  Snapshot
+                </p>
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
+                  <div
+                    className="h-full bg-emerald-400 transition-all"
+                    style={{ width: `${Math.min(activeRoadmap.progress || 0, 100)}%` }}
+                  />
+                </div>
+                <p className="mt-3 text-sm text-slate-400">
+                  {Math.min(activeRoadmap.progress || 0, 100)}% completed
+                </p>
+              </div>
+
+              {selectedNode && (
+                <div className="rounded-[2rem] border border-slate-800 bg-slate-900/35 p-6">
+                  <p className="text-xs font-bold uppercase tracking-[0.24em] text-cyan-400">
+                    Selected Node
+                  </p>
+                  <h5 className="mt-3 text-2xl font-black text-white">
+                    {selectedNode.title}
+                  </h5>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">
+                    {selectedNode.description || "No node description available."}
+                  </p>
+
+                  <div className="mt-5 grid gap-3">
+                    <div className="rounded-xl bg-slate-950/70 p-4">
+                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">
+                        Status
+                      </div>
+                      <div className="mt-1 font-bold text-white">
+                        {selectedNode.status.replace("_", " ")}
+                      </div>
+                    </div>
+                    <div className="rounded-xl bg-slate-950/70 p-4">
+                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">
+                        Reward
+                      </div>
+                      <div className="mt-1 font-bold text-emerald-300">
+                        {selectedNode.xpValue || 0} XP
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="rounded-[2rem] border border-slate-800 bg-slate-900/35 p-6">
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-cyan-400">
+                  Node Ledger
+                </p>
+
+                <div className="mt-4 max-h-[320px] space-y-3 overflow-y-auto pr-1">
+                  {roadmapNodes.map((node: any) => (
+                    <motion.button
+                      key={node._id}
+                      whileHover={{ scale: 1.01 }}
+                      onClick={() => setSelectedNodeId(node._id)}
+                      className="flex w-full items-center justify-between rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-left"
+                    >
+                      <div>
+                        <div className="font-semibold text-white">
+                          {node.title}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          #{(node.order || 0) + 1}
+                        </div>
+                      </div>
+
+                      <div
+                        className={`text-xs font-bold uppercase tracking-[0.22em] ${node.status === "completed"
+                          ? "text-emerald-300"
+                          : node.status === "in_progress"
+                            ? "text-cyan-300"
+                            : "text-slate-500"
+                          }`}
+                      >
+                        {node.status.replace("_", " ")}
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

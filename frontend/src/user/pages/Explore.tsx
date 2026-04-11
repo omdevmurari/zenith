@@ -13,10 +13,12 @@ const itemVars = {
 
 export default function Explore({
   isLoggedIn,
-  limit
+  limit,
+  onRequireLogin
 }: {
   isLoggedIn: boolean;
   limit?: number;
+  onRequireLogin?: () => void;
 }) {
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,27 +56,49 @@ export default function Explore({
     .slice(0, limit || communityRoadmaps.length);
 
   const handleStart = async (roadmap: { _id: any; }) => {
+    const token = localStorage.getItem("token");
 
-const token = localStorage.getItem("token");
+    if (!token || !isLoggedIn) {
+      alert("Please login first.");
+      onRequireLogin?.();
+      return;
+    }
 
-await fetch(
-"http://localhost:5000/api/user-roadmaps/start",
-{
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-Authorization: `Bearer ${token}`
-},
-body: JSON.stringify({
-roadmapId: roadmap._id
-})
-}
-);
+    try {
+      const res = await fetch(
+        "http://localhost:5000/api/user-roadmaps/start",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            roadmapId: roadmap._id
+          })
+        }
+      );
 
-alert("Course Started");
+      const data = await res.json();
 
-};
+      if (!res.ok) {
+        if (res.status === 401) {
+          alert("Please login first.");
+          onRequireLogin?.();
+          return;
+        }
 
+        alert(data?.message || "Unable to start this course right now.");
+        return;
+      }
+
+      alert(data?.progress !== undefined ? "Course already started" : "Course Started");
+    } catch (error) {
+      console.error(error);
+      alert("Unable to start this course right now.");
+    }
+
+  };
 
   return (
     <section className="min-h-screen w-full bg-[#020617] text-slate-200 p-6 md:p-12 font-sans relative z-20 overflow-hidden">
@@ -82,6 +106,20 @@ alert("Course Started");
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-cyan-900/10 rounded-full blur-[150px]" />
 
       <div className="max-w-7xl mx-auto relative z-10">
+
+        <div className="flex justify-between items-center mb-8">
+
+<motion.button
+whileHover={{ scale: 1.05 }}
+whileTap={{ scale: 0.95 }}
+onClick={() => window.history.back()}
+className="px-6 py-2 bg-cyan-500/10 border border-cyan-500/30 
+text-cyan-400 rounded-xl font-semibold"
+>
+← Go Back
+</motion.button>
+
+</div>
 
         {/* Header */}
         <header className="mb-12">
@@ -163,9 +201,9 @@ alert("Course Started");
                   </div>
                 )}
 
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-500 to-blue-600" />
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-500 to-blue-600"/>
 
-                <div className="flex justify-between mb-6">
+                <div className="flex justify-between mb-6 ">
                   <span className="text-xs text-slate-400">
                     {roadmap.category || "Development"}
                   </span>
@@ -183,21 +221,37 @@ alert("Course Started");
                   {roadmap.description}
                 </p>
 
-                <div className="flex justify-between items-center mt-auto">
+                <div className="flex justify-between items-center mt-auto gap-3">
 
-                  <span className="text-xs text-slate-500">
-                    {roadmap.level || "Beginner"}
-                  </span>
+<span className="text-xs text-slate-500">
+{roadmap.level || "Beginner"}
+</span>
 
-                  <button
-                    onClick={() => handleStart(roadmap)}
-                    disabled={locked || disabled}
-                    className="text-sm font-bold text-white bg-white/5 hover:bg-cyan-500 hover:text-black px-4 py-2 rounded-lg transition-all"
-                  >
-                    Start Course
-                  </button>
+<div className="flex gap-2">
 
-                </div>
+<button
+onClick={() => window.location.href = `/roadmap/${roadmap._id}`}
+disabled={locked || disabled}
+className="text-sm font-bold text-cyan-400 
+bg-cyan-500/10 hover:bg-cyan-500/20 
+px-4 py-2 rounded-lg transition-all"
+>
+Details
+</button>
+
+<button
+onClick={() => handleStart(roadmap)}
+disabled={locked || disabled}
+className="text-sm font-bold text-white 
+bg-white/5 hover:bg-cyan-500 hover:text-black 
+px-4 py-2 rounded-lg transition-all"
+>
+Start Course
+</button>
+
+</div>
+
+</div>
 
               </motion.div>
             );

@@ -54,6 +54,22 @@ export default function CreateRoadmap({
                     />
                 </div>
 
+                <div className="space-y-2">
+                    <label className="text-xs text-slate-400 uppercase">
+                        Difficulty
+                    </label>
+
+                    <select
+                        name="difficulty"
+                        defaultValue="Beginner"
+                        className="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-cyan-400"
+                    >
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                    </select>
+                </div>
+
                 {/* XP */}
                 <div className="space-y-2">
                     <label className="text-xs text-slate-400 uppercase">
@@ -93,7 +109,7 @@ export default function CreateRoadmap({
                     </div>
                     <input
                         type="checkbox"
-                        name="isPublished"
+                        name="published"
                         className="w-5 h-5"
                     />
                 </div>
