@@ -10,7 +10,7 @@ It combines roadmap management, skill-tree progression, OTP-based authentication
 - Explore community roadmaps
 - Start and continue roadmaps
 - Sequential node unlocking system
-- Dynamic constellation / skill-tree roadmap view
+- Dynamic constellation / skill-tree roadmap view.
 - Roadmap-specific progress tracking
 - Dashboard with:
   - continue learning
@@ -71,18 +71,18 @@ It combines roadmap management, skill-tree progression, OTP-based authentication
 ```bash
 PROJECT/
 +-- frontend/
-¦   +-- src/
-¦   ¦   +-- admin/
-¦   ¦   +-- components/
-¦   ¦   +-- user/
-¦
+ï¿½   +-- src/
+ï¿½   ï¿½   +-- admin/
+ï¿½   ï¿½   +-- components/
+ï¿½   ï¿½   +-- user/
+ï¿½
 +-- server/
-¦   +-- config/
-¦   +-- controllers/
-¦   +-- middleware/
-¦   +-- models/
-¦   +-- routes/
-¦   +-- utils/
+ï¿½   +-- config/
+ï¿½   +-- controllers/
+ï¿½   +-- middleware/
+ï¿½   +-- models/
+ï¿½   +-- routes/
+ï¿½   +-- utils/
 ```
 
 ## Main Modules
