@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import ZenithMap from "../../components/admin/ZenithMap";
 import { motion } from "framer-motion";
+import { apiUrl } from "../../lib/api";
 
 export default function RoadmapView() {
 
@@ -23,7 +24,7 @@ export default function RoadmapView() {
 
                 // Fetch Nodes
                 const nodeRes = await fetch(
-                    `http://localhost:5000/api/nodes/${id}`,
+                    apiUrl(`/api/nodes/${id}`),
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -46,7 +47,7 @@ export default function RoadmapView() {
 
                 // Check Started
                 const roadmapRes = await fetch(
-                    "http://localhost:5000/api/user-roadmaps/my",
+                    apiUrl("/api/user-roadmaps/my"),
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -72,7 +73,7 @@ export default function RoadmapView() {
 
                 // Fetch Progress
                 const progressRes = await fetch(
-                    "http://localhost:5000/api/progress",
+                    apiUrl("/api/progress"),
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -144,7 +145,7 @@ export default function RoadmapView() {
             const token = localStorage.getItem("token");
 
             await fetch(
-                "http://localhost:5000/api/user-roadmaps/start",
+                apiUrl("/api/user-roadmaps/start"),
                 {
                     method: "POST",
                     headers: {
@@ -179,7 +180,7 @@ export default function RoadmapView() {
 
         try {
             const res = await fetch(
-                `http://localhost:5000/api/progress/complete/${nodeId}`,
+                apiUrl(`/api/progress/complete/${nodeId}`),
                 {
                     method: "POST",
                     headers: {

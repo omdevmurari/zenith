@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { apiUrl } from "../../lib/api";
 
 const formatDate = (value?: string) => {
   if (!value) return "Never";
@@ -30,7 +31,7 @@ export default function AdminUsers() {
 
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:5000/api/admin/users", {
+      const res = await fetch(apiUrl("/api/admin/users"), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -65,7 +66,7 @@ export default function AdminUsers() {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/users/${userId}/make-admin`,
+        apiUrl(`/api/admin/users/${userId}/make-admin`),
         {
           method: "PATCH",
           headers: {
@@ -103,7 +104,7 @@ export default function AdminUsers() {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/users/${userId}/remove-admin`,
+        apiUrl(`/api/admin/users/${userId}/remove-admin`),
         {
           method: "PATCH",
           headers: {
@@ -141,7 +142,7 @@ export default function AdminUsers() {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://localhost:5000/api/admin/users/${userId}/toggle-disable`,
+        apiUrl(`/api/admin/users/${userId}/toggle-disable`),
         {
           method: "PATCH",
           headers: {

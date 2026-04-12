@@ -1,12 +1,13 @@
 ﻿import { useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import PasswordField from "../../components/PasswordField";
+import { apiUrl } from "../../lib/api";
 
 const NAME_REGEX = /^[A-Za-z]+(?:[A-Za-z ]*[A-Za-z])?$/;
 const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[^\s]{8,}$/;
 const OTP_REGEX = /^\d{6}$/;
-const API_BASE = "http://localhost:5000/api/auth";
 
 type AuthView = "login" | "register" | "forgot";
 type OtpPurpose = "register" | "login";
@@ -58,20 +59,8 @@ const getOtpValidationMessage = (value: string) => {
   return "";
 };
 
-const completeAuth = (data: any) => {
-  localStorage.setItem("token", data.token);
-  if (data.user) {
-    localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("role", data.user.role);
-  }
-  if (data.user?.role === "admin" || data.user?.role === "owner") {
-    window.location.href = "/admin";
-    return;
-  }
-  window.location.href = "/";
-};
-
 export default function Auth() {
+  const navigate = useNavigate();
   const [authView, setAuthView] = useState<AuthView>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -166,7 +155,7 @@ export default function Auth() {
   };
 
   const sendRequest = async (path: string, body: Record<string, unknown>) => {
-    const res = await fetch(`${API_BASE}${path}`, {
+    const res = await fetch(apiUrl(`/api/auth${path}`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -175,6 +164,20 @@ export default function Auth() {
     if (!res.ok) throw new Error(data?.message || "Request failed.");
     return data;
   };
+
+  const completeAuth = (data: any) => {
+    localStorage.setItem("token", data.token);
+    if (data.user) {
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("role", data.user.role);
+    }
+    if (data.user?.role === "admin" || data.user?.role === "owner") {
+      navigate("/admin", { replace: true });
+      return;
+    }
+    navigate("/", { replace: true });
+  };
+
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     resetMessages();

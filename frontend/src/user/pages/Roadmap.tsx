@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import ZenithMap from "../../components/admin/ZenithMap";
+import { apiUrl } from "../../lib/api";
 
 interface RoadmapProps {
   isLoggedIn?: boolean;
@@ -27,7 +28,7 @@ export default function Roadmap({ isLoggedIn }: RoadmapProps) {
     const fetchSnapshot = async () => {
       try {
         const roadmapRes = await fetch(
-          "http://localhost:5000/api/user-roadmaps/my",
+          apiUrl("/api/user-roadmaps/my"),
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -59,7 +60,7 @@ export default function Roadmap({ isLoggedIn }: RoadmapProps) {
 
         const [nodeRes, progressRes] = await Promise.all([
           fetch(
-            `http://localhost:5000/api/nodes/${latestRoadmap.roadmapId._id}`,
+            apiUrl(`/api/nodes/${latestRoadmap.roadmapId._id}`),
             {
               headers: {
                 Authorization: `Bearer ${token}`
@@ -67,7 +68,7 @@ export default function Roadmap({ isLoggedIn }: RoadmapProps) {
             }
           ),
           fetch(
-            "http://localhost:5000/api/progress",
+            apiUrl("/api/progress"),
             {
               headers: {
                 Authorization: `Bearer ${token}`

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import PasswordField from "../../components/PasswordField";
+import { apiUrl } from "../../lib/api";
 
 const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[^\s]{8,}$/;
@@ -63,9 +64,9 @@ export default function Profile() {
         };
 
         const [meRes, statsRes, roadmapRes] = await Promise.all([
-          fetch("http://localhost:5000/api/auth/me", { headers, cache: "no-store" }),
-          fetch("http://localhost:5000/api/progress/stats", { headers, cache: "no-store" }),
-          fetch("http://localhost:5000/api/user-roadmaps/my", { headers, cache: "no-store" }),
+          fetch(apiUrl("/api/auth/me"), { headers, cache: "no-store" }),
+          fetch(apiUrl("/api/progress/stats"), { headers, cache: "no-store" }),
+          fetch(apiUrl("/api/user-roadmaps/my"), { headers, cache: "no-store" }),
         ]);
 
         if (meRes.ok) {
@@ -122,7 +123,7 @@ export default function Profile() {
     setPasswordSuccess("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/change-password/request-otp", {
+      const res = await fetch(apiUrl("/api/auth/change-password/request-otp"), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -180,7 +181,7 @@ export default function Profile() {
     setPasswordLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/change-password/verify", {
+      const res = await fetch(apiUrl("/api/auth/change-password/verify"), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -1,6 +1,7 @@
 ﻿// src/App.tsx
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { apiUrl } from "./lib/api";
 
 // Import your pages
 import Landing from "./user/pages/Landing";
@@ -43,7 +44,7 @@ export default function App() {
 
     const checkSession = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/me", {
+        const res = await fetch(apiUrl("/api/auth/me"), {
           headers: {
             Authorization: `Bearer ${token}`
           },

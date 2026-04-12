@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiUrl } from "../../../lib/api";
 
 interface DashboardStats {
     totalOperatives: number;
@@ -48,7 +49,7 @@ export function useAdminAPI(state: any) {
         const fetchRoadmaps = async () => {
             try {
                 const res = await fetch(
-                    "http://localhost:5000/api/admin-roadmaps",
+                    apiUrl("/api/admin-roadmaps"),
                     {
                         headers: getAuthHeader()
                     }
@@ -73,7 +74,7 @@ export function useAdminAPI(state: any) {
         const fetchNodes = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:5000/api/nodes/${selectedRoadmapId}`,
+                    apiUrl(`/api/nodes/${selectedRoadmapId}`),
                     {
                         headers: getAuthHeader()
                     }
@@ -102,7 +103,7 @@ export function useAdminAPI(state: any) {
         const fetchDashboardStats = async () => {
             try {
                 const res = await fetch(
-                    "http://localhost:5000/api/admin/stats",
+                    apiUrl("/api/admin/stats"),
                     {
                         headers: getAuthHeader()
                     }
@@ -140,7 +141,7 @@ export function useAdminAPI(state: any) {
 
         try {
             const res = await fetch(
-                "http://localhost:5000/api/admin-roadmaps",
+                apiUrl("/api/admin-roadmaps"),
                 {
                     method: "POST",
                     headers: {
@@ -170,7 +171,7 @@ export function useAdminAPI(state: any) {
         try {
 
             const res = await fetch(
-                `http://localhost:5000/api/admin-roadmaps/${id}/toggle`,
+                apiUrl(`/api/admin-roadmaps/${id}/toggle`),
                 {
                     method: "PATCH",
                     headers: {
@@ -216,8 +217,8 @@ export function useAdminAPI(state: any) {
         const isEditing = rightPaneMode === "edit-node";
 
         const url = isEditing
-            ? `http://localhost:5000/api/nodes/${activeNodeId}`
-            : `http://localhost:5000/api/nodes`;
+            ? apiUrl(`/api/nodes/${activeNodeId}`)
+            : apiUrl("/api/nodes");
 
         const method = isEditing ? "PUT" : "POST";
 
@@ -260,7 +261,7 @@ export function useAdminAPI(state: any) {
 
         try {
             const res = await fetch(
-                `http://localhost:5000/api/nodes/${deleteModal.id}`,
+                apiUrl(`/api/nodes/${deleteModal.id}`),
                 {
                     method: "DELETE",
                     headers: getAuthHeader()
@@ -288,7 +289,7 @@ export function useAdminAPI(state: any) {
         try {
 
             await fetch(
-                "http://localhost:5000/api/nodes/positions",
+                apiUrl("/api/nodes/positions"),
                 {
                     method: "PATCH",
                     headers: {
@@ -309,7 +310,7 @@ export function useAdminAPI(state: any) {
     const reorderNodes = async (orderedNodes: any[]) => {
         try {
             const res = await fetch(
-                "http://localhost:5000/api/nodes/reorder/batch",
+                apiUrl("/api/nodes/reorder/batch"),
                 {
                     method: "POST",
                     headers: {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { apiUrl } from "../../lib/api";
 
 const containerVars = {
   hidden: { opacity: 0 },
@@ -31,7 +32,7 @@ export default function Explore({
       try {
 
         const res = await fetch(
-          "http://localhost:5000/api/roadmaps"
+          apiUrl("/api/roadmaps")
         );
 
         const data = await res.json();
@@ -66,7 +67,7 @@ export default function Explore({
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/user-roadmaps/start",
+        apiUrl("/api/user-roadmaps/start"),
         {
           method: "POST",
           headers: {

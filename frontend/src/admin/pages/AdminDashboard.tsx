@@ -1,5 +1,6 @@
 import { motion, type Variants } from "framer-motion";
 import { useEffect, useState } from "react";
+import { apiUrl } from "../../lib/api";
 
 const containerVars: Variants = {
   hidden: { opacity: 0 },
@@ -26,7 +27,7 @@ export default function AdminDashboard() {
         const token = localStorage.getItem("token");
 
         const res = await fetch(
-          "http://localhost:5000/api/admin/dashboard",
+          apiUrl("/api/admin/dashboard"),
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -126,7 +127,7 @@ export default function AdminDashboard() {
                 const token = localStorage.getItem("token");
 
                 window.open(
-                  "http://localhost:5000/api/admin/export?token=" + token
+                  apiUrl(`/api/admin/export?token=${token}`)
                 );
 
               }}

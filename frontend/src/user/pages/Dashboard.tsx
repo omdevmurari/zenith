@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { apiUrl } from "../../lib/api";
 
 const formatDateKey = (date: Date) => {
   const year = date.getFullYear();
@@ -117,7 +118,7 @@ export default function Dashboard({ showBack = true }: any) {
     try {
 
       const statsRes = await fetch(
-        "http://localhost:5000/api/progress/stats",
+        apiUrl("/api/progress/stats"),
         {
           cache: "no-store",
           headers: {
@@ -133,7 +134,7 @@ export default function Dashboard({ showBack = true }: any) {
 
 
       const activityRes = await fetch(
-        "http://localhost:5000/api/activity",
+        apiUrl("/api/activity"),
         {
           cache: "no-store",
           headers: {
@@ -148,7 +149,7 @@ export default function Dashboard({ showBack = true }: any) {
       }
 
       const progressRes = await fetch(
-        "http://localhost:5000/api/progress",
+        apiUrl("/api/progress"),
         {
           cache: "no-store",
           headers: {
@@ -171,7 +172,7 @@ export default function Dashboard({ showBack = true }: any) {
 
       // ✅ Fetch user roadmaps
       const roadmapRes = await fetch(
-        "http://localhost:5000/api/user-roadmaps/my",
+        apiUrl("/api/user-roadmaps/my"),
         {
           cache: "no-store",
           headers: {
@@ -197,7 +198,7 @@ export default function Dashboard({ showBack = true }: any) {
             sortedRoadmaps[0]?.roadmapId?._id;
 
           const nodeRes = await fetch(
-            `http://localhost:5000/api/nodes/${firstRoadmapId}`,
+            apiUrl(`/api/nodes/${firstRoadmapId}`),
             {
               headers: {
                 Authorization: `Bearer ${token}`
